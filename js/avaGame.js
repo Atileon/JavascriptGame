@@ -67,6 +67,20 @@ class Player extends Component {
         this.x = this.posX;
         this.y = this.posY;
     }
+    moveUp(){
+        this.posY -= this.h;
+    }
+    moveDown(){
+        this.posY += this.h;
+    }
+    moveLeft(){
+        this.posX -= this.h;
+    }
+    moveRight(){
+        this.posX += this.h;
+    }
+              
+            
     // drawPlayer(context){// this take the global context variable to draw player
     //     context.fillStyle = this.color;
     //     context.fillRect(this.x, this.y, this.w, this.h);
@@ -173,6 +187,31 @@ function avaGame(){
             }                
         }
     }
+    
+    function movement(obj){
+        let moveCounter = 0;
+        window.addEventListener('keydown',function(e){
+            switch(e.keyCode){
+                case 38:
+                obj.moveUp();
+                moveCounter +=1;
+                break;
+                case 40:
+                obj.moveDown();
+                moveCounter +=1;
+                break;
+                case 37:
+                obj.moveLeft();
+                moveCounter +=1;
+                break;
+                case 39:
+                obj.moveRight();
+                moveCounter +=1;
+                break;
+            }
+            console.log('the move Counter is: '+ moveCounter);
+        })
+    }
     function drawGame(){
        //=========================
     //    let progress = 0;
@@ -204,32 +243,38 @@ function avaGame(){
          
     }
 
-    function moveTo(id,event,obj){
-        let x = document.getElementById(id);
-        x.addEventListener(event,function(){
-            if(id == 'up'){
-                obj.posY -=obj.h;
-            }else if(id =='down'){
-                obj.posY += obj.h;
-            }else if(id == 'left'){
-                obj.posX -= obj.w;
-            }else if(id == 'right'){
-                obj.posX += obj.w;
-            }
-            console.log('its moving: '+ id + ' '+ p1.x+ ','+p1.y);
-        })            
-    }
+    // function moveTo(id,event,obj){
+    //     let x = document.getElementById(id);
+    //     x.addEventListener(event,function(){
+    //         if(id == 'up'){
+    //             obj.posY -=obj.h;
+    //         }else if(id =='down'){
+    //             obj.posY += obj.h;
+    //         }else if(id == 'left'){
+    //             obj.posX -= obj.w;
+    //         }else if(id == 'right'){
+    //             obj.posX += obj.w;
+    //         }
+    //         console.log('its moving: '+ id + ' '+ p1.x+ ','+p1.y);
+    //     })            
+    // }
 
     //Controlls...it would be switch later to a kewboard input
-    moveTo('up','mousedown',p1);
-    moveTo('down','mousedown',p1);
-    moveTo('left','mousedown',p1);
-    moveTo('right','mousedown',p1);
+    // moveTo('up','click',p1);
+    // moveTo('down','click',p1);
+    // moveTo('left','click',p1);
+    // moveTo('right','click',p1);
+
+    //keyboard Controll
+    
+    movement(p2);
+    
 
     function updateGame(){
 
         clearCanvas();//this clear the canvas
-        p1.newPos();//this take the new position after mouse input on canvas for player 1
+        p1.newPos();
+        p2.newPos();//this take the new position after mouse input on canvas for player 1
         drawGame();//this draw the canvas again with positions updated
 
          
