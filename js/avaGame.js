@@ -166,7 +166,6 @@ function avaGame(){
         for(let rowId = 0; rowId<gameArea.rows; rowId++){
             for(let colId = 0; colId<gameArea.cols; colId++){
                 let tileId = gameArea.mapArr[rowId][colId] + gameArea.mapIO;
-                console.log(tileId);
                 let srcX = Math.floor(tileId % 10) * 64;
                 let srcY = Math.floor(tileId / 10) * 64;
                 context.drawImage(tileSheet, srcX, srcY, 64,64, colId*64, rowId*64,64,64);
@@ -221,6 +220,7 @@ function avaGame(){
         })            
     }
 
+    //Controlls...it would be switch later to a kewboard input
     moveTo('up','mousedown',p1);
     moveTo('down','mousedown',p1);
     moveTo('left','mousedown',p1);
@@ -228,13 +228,12 @@ function avaGame(){
 
     function updateGame(){
 
-        clearCanvas();
-        p1.newPos();
-        p2.newPos();
-        drawGame();
+        clearCanvas();//this clear the canvas
+        p1.newPos();//this take the new position after mouse input on canvas for player 1
+        drawGame();//this draw the canvas again with positions updated
 
          
-         console.log(p1);
+         console.log(p1.x, p1.y);
          if (moveTo){
             requestAnimationFrame(updateGame);
          }else{
@@ -248,5 +247,5 @@ function avaGame(){
 
     drawGame();
     updateGame();
-    // requestAnimationFrame(avaGame);
+
 }//end of game app
