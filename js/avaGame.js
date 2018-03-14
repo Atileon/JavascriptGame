@@ -66,6 +66,16 @@ class Player extends Component {
     newPos(){
         this.x = this.posX;
         this.y = this.posY;
+        //this if else condition would prevent to get out of the canvas
+        if (this.x < 0){
+            this.moveRight();
+        }else if((this.x + this.w) > canvas.width){
+            this.moveLeft();
+        }else if(this.y < 0){
+            this.moveDown();
+        }else if((this.y + this.h) > canvas.width){
+            this.moveUp();
+        }
     }
     moveUp(){
         this.posY -= this.h;
@@ -160,12 +170,13 @@ function avaGame(){
     players.push(carlitos);
     let lucifera = new Player(0,576,64,64,'violet','Lucifera',weapons[2]);
     players.push(lucifera);
+    
 
     
     let p1 = carlitos;
     let p2 = lucifera;
 
-    console.log(p1.h);
+    console.log(players);
 
     Debugger.log('DrawingCanvas');
 
@@ -187,9 +198,12 @@ function avaGame(){
             }                
         }
     }
+    //turn mechanism
+    let moveCounter = 0;
+    let playerId = 0;
     
     function movement(obj){
-        let moveCounter = 0;
+            
         window.addEventListener('keydown',function(e){
             switch(e.keyCode){
                 case 38:
@@ -209,9 +223,23 @@ function avaGame(){
                 moveCounter +=1;
                 break;
             }
+            if(moveCounter > 3){
+                    
+                playerId ++;
+                
+
+                if (playerId >= players.length){
+                    console.log('this is long array');
+                    playerId = 0;
+                }
+                moveCounter = 1;
+            }
             console.log('the move Counter is: '+ moveCounter);
+            console.log('the player id is : '+playerId);
         })
     }
+    
+    //==================================================
     function drawGame(){
        //=========================
     //    let progress = 0;
@@ -243,34 +271,17 @@ function avaGame(){
          
     }
 
-    // function moveTo(id,event,obj){
-    //     let x = document.getElementById(id);
-    //     x.addEventListener(event,function(){
-    //         if(id == 'up'){
-    //             obj.posY -=obj.h;
-    //         }else if(id =='down'){
-    //             obj.posY += obj.h;
-    //         }else if(id == 'left'){
-    //             obj.posX -= obj.w;
-    //         }else if(id == 'right'){
-    //             obj.posX += obj.w;
-    //         }
-    //         console.log('its moving: '+ id + ' '+ p1.x+ ','+p1.y);
-    //     })            
-    // }
-
-    //Controlls...it would be switch later to a kewboard input
-    // moveTo('up','click',p1);
-    // moveTo('down','click',p1);
-    // moveTo('left','click',p1);
-    // moveTo('right','click',p1);
-
+   
     //keyboard Controll
     
-    movement(p2);
+    // movement(p2);
+    movement(p1);
     
 
     function updateGame(){
+        requestAnimationFrame(updateGame);
+
+        
 
         clearCanvas();//this clear the canvas
         p1.newPos();
@@ -279,14 +290,12 @@ function avaGame(){
 
          
          console.log(p1.x, p1.y);
-         if (moveTo){
-            requestAnimationFrame(updateGame);
-         }else{
-             cancelAnimationFrame(updateGame);
-         }
+        //  if (moveTo){
+            
+        //  }else{
+        //      cancelAnimationFrame(updateGame);
+        //  }
 
-        
-       
     }
     //============================
 
