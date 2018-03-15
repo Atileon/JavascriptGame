@@ -56,16 +56,28 @@ class Weapon extends Component {
 class Player extends Component {
     constructor(x,y,width,height,color,name,weaponObj){
         super(x,y,width,height,color);
+        //next 3 lines to set a random position for the players
+        let tileId = Math.floor(Math.random()*100-1);
+        this.x = Math.floor(tileId % 10)*64;//value on X axis
+        this.y = Math.floor(tileId / 10)*64;//value on Y axis
+
         this.name = name;
         this.health = 100;
         this.weapon = weaponObj;
         this.damage = weaponObj.damage;
-        this.posX = 0;
-        this.posY = 0;        
+        this.posX = this.x;//initial position on X
+        this.posY = this.y;//initial position on Y
     }
+    // randPos(){
+    //     let tileId = Math.floor(Math.random()*100-1);
+    //     this.x = Math.floor(tileId % 10)*64;
+    //     this.y = Math.floor(tileId / 10)*64;
+    //     return this;
+    // }
     newPos(){
-        this.x = this.posX;
-        this.y = this.posY;
+        this.x = this.posX;//position updated on X
+        this.y = this.posY;//position updated on Y
+
         //this if else condition would prevent to get out of the canvas
         if (this.x < 0){
             this.moveRight();
@@ -84,10 +96,10 @@ class Player extends Component {
         this.posY += this.h;
     }
     moveLeft(){
-        this.posX -= this.h;
+        this.posX -= this.w;
     }
     moveRight(){
-        this.posX += this.h;
+        this.posX += this.w;
     }
               
             
@@ -118,10 +130,15 @@ Debugger.log = function (message) {
 //Once the window is loaded this function would execute the game
 function WindowLoaded (){
     avaGame();
-    // requestAnimationFrame(avaGame);
+    
 }
 
 function avaGame(){
+
+    let now;
+    let dt = 0;
+    let lastT = performance.now();
+
     
     //This is the main function and here would be the global variables
     let canvas = document.getElementById('canvas');
@@ -162,27 +179,30 @@ function avaGame(){
     let whipe = new Weapon(576,576,64,64,'green','whipe',60);
     weapons.push(whipe);
 
+    Debugger.log('weapons had been created: ');
     console.log(weapons);
 
     //As the weapons Objects we could push the players into an empty array
     // in this case the players array
-    let carlitos = new Player(0,0,64,64,'black','carlitos',weapons[1]);
+    let carlitos = new Player(0,0,64,64,'black','carlitos',weapons[0]);
     players.push(carlitos);
-    let lucifera = new Player(0,576,64,64,'violet','Lucifera',weapons[2]);
+    let lucifera = new Player(0,0,64,64,'violet','Lucifera',weapons[0]);
     players.push(lucifera);
-    
 
-    
+    Debugger.log('players ar on the arena: ');
+    console.log(players);
+
     let p1 = carlitos;
     let p2 = lucifera;
 
-    console.log(players);
+
 
     Debugger.log('DrawingCanvas');
 
     //=================================================================
     function clearCanvas(){
         context.clearRect(0,0,canvas.width,canvas.height);
+        // Debugger.log('clearing Canvas');
     }
 
 
@@ -190,6 +210,7 @@ function avaGame(){
 
         for(let rowId = 0; rowId<gameArea.rows; rowId++){
             for(let colId = 0; colId<gameArea.cols; colId++){
+                // let tileId = Math.floor(Math.random()*100 + gameArea.mapIO); // lol
                 let tileId = gameArea.mapArr[rowId][colId] + gameArea.mapIO;
                 let srcX = Math.floor(tileId % 10) * 64;
                 let srcY = Math.floor(tileId / 10) * 64;
@@ -198,7 +219,8 @@ function avaGame(){
             }                
         }
     }
-    //turn mechanism
+
+    //turn mechanism TODO
     let moveCounter = 0;
     let playerId = 0;
     
@@ -223,37 +245,30 @@ function avaGame(){
                 moveCounter +=1;
                 break;
             }
-            if(moveCounter > 3){
+            if(moveCounter >= 3){
                     
                 playerId ++;
-                
+                switchPlayer(playerId);
 
                 if (playerId >= players.length){
                     console.log('this is long array');
                     playerId = 0;
                 }
-                moveCounter = 1;
+                moveCounter = 0;
             }
+                
+            
             console.log('the move Counter is: '+ moveCounter);
             console.log('the player id is : '+playerId);
-        })
+        });
+
     }
-    
+
+    function switchPlayer(playerId){
+        console.log('player '+players[playerId]+' has been selected');
+    }
     //==================================================
     function drawGame(){
-       //=========================
-    //    let progress = 0;
-
-    //    if(startTime < 0){
-    //        startTime = timestamp;
-    //    }else{
-    //        progress = timestamp - startTime;
-    //    }
-
-    //    if(progress < transitionLength){
-    //        requestAnimationFrame(updateGame);
-    //    }
-
 
         function drawComponents(){
             mazza.drawIt(context);
@@ -261,7 +276,8 @@ function avaGame(){
             whipe.drawIt(context);
         }
         function drawPlayers(){
-            p1.drawIt(context);
+           
+            p1.drawIt(context);            
             p2.drawIt(context);
         }
 
@@ -272,32 +288,24 @@ function avaGame(){
     }
 
    
-    //keyboard Controll
-    
-    // movement(p2);
-    movement(p1);
     
 
     function updateGame(){
         requestAnimationFrame(updateGame);
 
-        
-
+        drawGame();
         clearCanvas();//this clear the canvas
         p1.newPos();
         p2.newPos();//this take the new position after mouse input on canvas for player 1
         drawGame();//this draw the canvas again with positions updated
 
-         
-         console.log(p1.x, p1.y);
-        //  if (moveTo){
-            
-        //  }else{
-        //      cancelAnimationFrame(updateGame);
-        //  }
-
     }
     //============================
+    //keyboard Controll
+    movement(players[playerId]);
+    // movement(p2);
+    
+    
 
     drawGame();
     updateGame();
