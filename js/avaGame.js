@@ -89,6 +89,7 @@ class Player extends Component {
             this.moveUp();
         }
     }
+    
     moveUp(){
         this.posY -= this.h;
     }
@@ -189,8 +190,8 @@ function avaGame(){
     let lucifera = new Player(0,0,64,64,'violet','Lucifera',weapons[0]);
     players.push(lucifera);
 
-    Debugger.log('players ar on the arena: ');
-    console.log(players);
+    Debugger.log('players are on the arena: ');
+    console.log(players.length);
 
     let p1 = carlitos;
     let p2 = lucifera;
@@ -223,50 +224,51 @@ function avaGame(){
     //turn mechanism TODO
     let moveCounter = 0;
     let playerId = 0;
+    window.addEventListener('keydown', function(e){movement(players[playerId],e)});
     
-    function movement(obj){
-            
-        window.addEventListener('keydown',function(e){
-            switch(e.keyCode){
-                case 38:
-                obj.moveUp();
-                moveCounter +=1;
-                break;
-                case 40:
-                obj.moveDown();
-                moveCounter +=1;
-                break;
-                case 37:
-                obj.moveLeft();
-                moveCounter +=1;
-                break;
-                case 39:
-                obj.moveRight();
-                moveCounter +=1;
-                break;
-            }
-            if(moveCounter >= 3){
-                    
-                playerId ++;
-                switchPlayer(playerId);
+    function movement(obj,e){
 
-                if (playerId >= players.length){
-                    console.log('this is long array');
-                    playerId = 0;
-                }
-                moveCounter = 0;
-            }
+        switch(e.keyCode){
+            case 38://up arrow
+            obj.moveUp();
+            moveCounter +=1;
+            break;
+            case 40://down arrow
+            obj.moveDown();
+            moveCounter +=1;
+            break;
+            case 37://left arrow
+            obj.moveLeft();
+            moveCounter +=1;
+            break;
+            case 39://right arrow
+            obj.moveRight();
+            moveCounter +=1;
+            break;
+            case 13:// Enter keyboard, this to switch immediatly to another player
+            moveCounter +=3;
+            break;
+        }
+        console.log('here the player is: '+playerId);
+        if(moveCounter >= 3){
                 
-            
-            console.log('the move Counter is: '+ moveCounter);
-            console.log('the player id is : '+playerId);
-        });
+            playerId ++;
+            console.log('the player on Array is: '+playerId);
 
+            if (playerId == players.length){
+
+                playerId = 0;
+            }
+            console.log('switch to player '+ playerId);
+            console.log('the movecounter now: '+moveCounter);
+            moveCounter = 0;
+            console.log('the movecounter then: '+moveCounter);
+        }
+
+        return playerId;
     }
 
-    function switchPlayer(playerId){
-        console.log('player '+players[playerId]+' has been selected');
-    }
+    
     //==================================================
     function drawGame(){
 
@@ -277,37 +279,36 @@ function avaGame(){
         }
         function drawPlayers(){
            
-            p1.drawIt(context);            
+            p1.drawIt(context);
             p2.drawIt(context);
         }
 
        drawMap();
        drawComponents();
        drawPlayers();
-         
     }
-
-   
-    
 
     function updateGame(){
         requestAnimationFrame(updateGame);
 
-        drawGame();
+        
         clearCanvas();//this clear the canvas
         p1.newPos();
         p2.newPos();//this take the new position after mouse input on canvas for player 1
         drawGame();//this draw the canvas again with positions updated
-
+       
     }
     //============================
     //keyboard Controll
-    movement(players[playerId]);
+    
     // movement(p2);
     
     
 
     drawGame();
     updateGame();
+    
+
+
 
 }//end of game app
