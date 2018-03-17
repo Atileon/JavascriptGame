@@ -33,7 +33,7 @@ class Component{
         this.area = area;
         //next 4 lines to set a random position for the players
         // let tileId = Math.floor(Math.random()*100-1);//This because we are assuming visualy that there are 100 cells but on array are just 99
-        this.tileId = this.startArea();// this to compare tile ids of any component
+        this.tileId = this.startArea();// this value to compare tile ids of any component
         this.x = Math.floor(this.tileId % 10)*64;//value on X axis
         this.y = Math.floor(this.tileId / 10)*64;//value on Y axis
         
@@ -58,12 +58,6 @@ class Component{
             this.tileId = tileIdC;
             break;
         }
-        
-        return this.tileId
-    }
-    secondArea(){
-        let tileIdB = Math.floor(Math.random()*100-1)+50;
-        this.tileId = tileIdB;
         return this.tileId
     }
     drawIt(context){// this take the global context variable to draw Component
@@ -94,12 +88,7 @@ class Player extends Component {
         this.posX = this.x;//initial position on X
         this.posY = this.y;//initial position on Y
     }
-    // randPos(){
-    //     let tileId = Math.floor(Math.random()*100-1);
-    //     this.x = Math.floor(tileId % 10)*64;
-    //     this.y = Math.floor(tileId / 10)*64;
-    //     return this;
-    // }
+
     newPos(){
         this.x = this.posX;//position updated on X
         this.y = this.posY;//position updated on Y
