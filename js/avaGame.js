@@ -28,14 +28,43 @@ class Map {
 }
 
 class Component{
-    constructor(x,y,width,height,color){
-        this.x = x;
-        this.y = y;
+    constructor(area = 'a',x,y,width,height,color){
+        // The area variable will set the area where the component would be deployed
+        this.area = area;
+        //next 4 lines to set a random position for the players
+        // let tileId = Math.floor(Math.random()*100-1);//This because we are assuming visualy that there are 100 cells but on array are just 99
+        this.tileId = this.startArea();// this to compare tile ids of any component
+        this.x = Math.floor(this.tileId % 10)*64;//value on X axis
+        this.y = Math.floor(this.tileId / 10)*64;//value on Y axis
+        
         this.w = width;
         this.h = height;
         this.color = color;
         this.moveX = 0;
         this.moveY = 0;
+    }
+    startArea(){
+        switch(this.area){
+            case 'a':
+            let tileIdA = Math.floor(Math.random()*20-1);
+            this.tileId = tileIdA;
+            break;
+            case 'b':
+            let tileIdB = Math.floor(Math.random()*(70-30)-1) + 30;
+            this.tileId = tileIdB;
+            break;
+            case 'c':
+            let tileIdC = Math.floor(Math.random()*(100-80)-1) + 80;
+            this.tileId = tileIdC;
+            break;
+        }
+        
+        return this.tileId
+    }
+    secondArea(){
+        let tileIdB = Math.floor(Math.random()*100-1)+50;
+        this.tileId = tileIdB;
+        return this.tileId
     }
     drawIt(context){// this take the global context variable to draw Component
         context.fillStyle = this.color;
@@ -45,8 +74,8 @@ class Component{
 }
 
 class Weapon extends Component {
-    constructor(x,y,width,height,color,name, damage){
-        super(x,y,width,height,color);
+    constructor(area,x,y,width,height,color,name, damage){
+        super(area,x,y,width,height,color);
         this.name = name;
         this.damage = damage;
     }
@@ -54,12 +83,9 @@ class Weapon extends Component {
 }
 
 class Player extends Component {
-    constructor(x,y,width,height,color,name,weaponObj){
-        super(x,y,width,height,color);
-        //next 3 lines to set a random position for the players
-        let tileId = Math.floor(Math.random()*100-1);
-        this.x = Math.floor(tileId % 10)*64;//value on X axis
-        this.y = Math.floor(tileId / 10)*64;//value on Y axis
+    constructor(area,x,y,width,height,color,name,weaponObj){
+        super(area,x,y,width,height,color);
+        
 
         this.name = name;
         this.health = 100;
@@ -172,31 +198,40 @@ function avaGame(){
     let tileSheet = new Image();
     tileSheet.addEventListener('load', drawGame, false);
     tileSheet.src = '../img/tilesheet.png'
-    //Now we must create some weapons to push on the weapons empty array
-    let mazza = new Weapon(64,64,64,64,'red','mazza',35);
-    weapons.push(mazza);
-    let banana = new Weapon(384,384,64,64,'yellow','banana',50);
+    //Now we must create some weapons to push on the weapons[] empty array
+    let claw = new Weapon('b',0,0,64,64,'brown','claw',35);
+    weapons.push(claw);
+    let banana = new Weapon('b',0,0,64,64,'yellow','banana',50);
     weapons.push(banana);
-    let whipe = new Weapon(576,576,64,64,'green','whipe',60);
+    let whipe = new Weapon('b',0,0,64,64,'red','whipe',60);
     weapons.push(whipe);
+    let papaya = new Weapon('b',0,0,64,64,'orange','papaya',60);
+    weapons.push(papaya);
 
     Debugger.log('weapons had been created: ');
     console.log(weapons);
 
     //As the weapons Objects we could push the players into an empty array
-    // in this case the players array
-    let carlitos = new Player(0,0,64,64,'black','carlitos',weapons[0]);
+    // in this case the players[] array
+    let carlitos = new Player('a',0,0,64,64,'black','carlitos',weapons[0]);
     players.push(carlitos);
-    let lucifera = new Player(0,0,64,64,'violet','Lucifera',weapons[0]);
+    let lucifera = new Player('c',0,0,64,64,'white','Lucifera',weapons[0]);
     players.push(lucifera);
 
     Debugger.log('players are on the arena: ');
-    console.log(players.length);
+    console.log(players);
 
     let p1 = carlitos;
     let p2 = lucifera;
+    //============= position on map displayed on console ================
+    console.log('the id of player 1 is: '+p1.tileId);
+    console.log('the id of player 2 is: '+p2.tileId);
 
-
+    console.log('the id of '+ weapons[0].name+' is: '+weapons[0].tileId);
+    console.log('the id of '+ weapons[1].name+' is: '+weapons[1].tileId);
+    console.log('the id of '+ weapons[2].name+' is: '+weapons[2].tileId);
+    console.log('the id of '+ weapons[3].name+' is: '+weapons[3].tileId);
+    //===================================================================
 
     Debugger.log('DrawingCanvas');
 
@@ -251,12 +286,12 @@ function avaGame(){
         }
         console.log('here the player is: '+playerId);
         if(moveCounter >= 3){
-                
             playerId ++;
+            
             console.log('the player on Array is: '+playerId);
 
             if (playerId == players.length){
-
+                
                 playerId = 0;
             }
             console.log('switch to player '+ playerId);
@@ -267,36 +302,47 @@ function avaGame(){
 
         return playerId;
     }
-
     
+
+  
     //==================================================
     function drawGame(){
 
         function drawComponents(){
-            mazza.drawIt(context);
-            banana.drawIt(context);
-            whipe.drawIt(context);
+            weapons[0].drawIt(context);
+            weapons[1].drawIt(context);
+            weapons[2].drawIt(context);
+            weapons[3].drawIt(context);
         }
         function drawPlayers(){
-           
             p1.drawIt(context);
             p2.drawIt(context);
         }
+        function preventNextPlayers(){
+            if(p1.tileId >= 52 && p2.tileId <= 47){
+                drawPlayers();
+            }else{
+                updateGae();
+            }
+        }
+        
 
        drawMap();
        drawComponents();
+    //    preventNextPlayers();
        drawPlayers();
+           
+       
+
     }
 
     function updateGame(){
-        requestAnimationFrame(updateGame);
-
         
         clearCanvas();//this clear the canvas
         p1.newPos();
         p2.newPos();//this take the new position after mouse input on canvas for player 1
         drawGame();//this draw the canvas again with positions updated
-       
+        requestAnimationFrame(updateGame);
     }
     //============================
     //keyboard Controll
@@ -306,7 +352,7 @@ function avaGame(){
     
 
     drawGame();
-    updateGame();
+    requestAnimationFrame(updateGame);
     
 
 
