@@ -243,7 +243,7 @@ function avaGame(){
         }
     }
 
-    //turn mechanism TODO
+    //======================TURN MECHANISM=============================
     let moveCounter = 0;
     let playerId = 0;
     let turnChange = false;
@@ -274,16 +274,18 @@ function avaGame(){
             break;
 
             case 13:// Enter keyboard, this to switch immediatly to another player
-            moveCounter +=4;
+            moveCounter +=3;
             break;
 
             case 72: // Key (H) to take weapon
             getWeapon(players,weapons);
+            moveCounter +=4;
             break;
 
         }
         console.log('here the player is: '+playerId);
         if(moveCounter >= 3){
+            moveCounter = 0;
             playerId ++;
 
             console.log('the player on Array is: '+playerId);
@@ -295,15 +297,21 @@ function avaGame(){
             }
             console.log('switch to player '+ (playerId +1));
             console.log('the movecounter now: '+moveCounter);
-            moveCounter = 0;
+            
             console.log('the movecounter then: '+moveCounter);
         }
 
         return playerId;
     }
-    
-    function getWeapon(playerArr,weapArray){
 
+
+    //the next function are activated on the keboard control (H) to take weapon
+
+    function getWeapon(playerArr,weapArray){
+        //loop to go inside the arrays of players[] and weapons[] to evaluate the coordinates
+        // of each object when player are over the weapon so this would return the 
+        //object to pass into the constructor of player
+        // If the coords are not equals return de default value of player the weapon[0] with base damage
         for(let p = 0; p < playerArr.length; p++){
             for(let i=0; i < weapArray.length; i++){
                 if( playerArr[p].x == weapArray[i].x && playerArr[p].y == weapArray[i].y){
@@ -318,7 +326,8 @@ function avaGame(){
     }
 
   
-    //==================================================
+    //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
+
     function drawGame(){
 
         function drawComponents(){
@@ -341,11 +350,9 @@ function avaGame(){
        drawComponents();
 
        drawPlayers();
-       
-
-       
 
     }
+    //===========THE GAME LOOP============================
 
     function updateGame(){
         requestAnimationFrame(updateGame);
@@ -355,10 +362,9 @@ function avaGame(){
         drawGame();//this draw the canvas again with positions updated
     }
     //============================
-    //keyboard Controll
-    // movement(p2);
     
-    drawGame();
+    
+    // drawGame();
     requestAnimationFrame(updateGame);
     
 
