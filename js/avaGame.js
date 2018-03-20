@@ -33,30 +33,46 @@ class Component{
         this.area = area;
         //next 4 lines to set a random position for the players
         // let tileId = Math.floor(Math.random()*100-1);//This because we are assuming visualy that there are 100 cells but on array are just 99
-        this.tileId = this.startArea();// this simply to set an tile to deploy component followin the starArea method
-        this.x = Math.floor(this.tileId % 10)*64;//value on X axis
-        this.y = Math.floor(this.tileId / 10)*64;//value on Y axis
+        this.startId = this.startArea();// this simply to set an tile to deploy component followin the starArea method
+        this.x = Math.floor(this.startId % 10)*64;//value on X axis
+        this.y = Math.floor(this.startId / 10)*64;//value on Y axis
         
         this.w = width;
         this.h = height;
         this.color = color;
+
+        
+        this.tileId = this.getId();
+    }
+    getId(){
+        //this method could get us the Tile Id on Map to 
+        //compare with any other element to get or to fight
+        this.tileX = Math.floor(this.x/this.w);
+        this.tileY = Math.floor(this.y/this.h);
+        this.tileId = Math.floor(this.tileY * 10)+ this.tileX;
+        return this.tileId;
     }
     startArea(){
+        // this method give the element an area to start on map
+        // the Top Area is 'a'
+        // the Middle Area is 'b'
+        // and the Bottom Area is 'c'
+
         switch(this.area){
             case 'a':
             let tileIdA = Math.floor(Math.random()*20-1);
-            this.tileId = tileIdA;
+            return this.startId = tileIdA;
             break;
             case 'b':
             let tileIdB = Math.floor(Math.random()*(70-30)-1) + 30;
-            this.tileId = tileIdB;
+            return this.startId = tileIdB;
             break;
             case 'c':
             let tileIdC = Math.floor(Math.random()*(100-80)-1) + 80;
-            this.tileId = tileIdC;
+            return this.startId = tileIdC;
             break;
         }
-        return this.tileId
+        return this.startId;
     }
     drawIt(context){// this take the global context variable to draw Component
         context.fillStyle = this.color;
@@ -77,7 +93,6 @@ class Weapon extends Component {
 class Player extends Component {
     constructor(area,x,y,width,height,color,name,weapons){
         super(area,x,y,width,height,color);
-        
 
         this.name = name;
         this.health = 100;
@@ -87,8 +102,20 @@ class Player extends Component {
         this.posY = this.y;//initial position on Y
         // this.upgradeWeapon = this.weaponNew();
     }
-    upWeapon(i){
-         this.nw = this.weaponArr[i];
+    drawP(context,img){// this take the global context variable to draw Component
+        
+        context.drawImage(img, this.x, this.y, this.w, this.h);
+        context.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    getWeapon(){
+        for(let i=0; i < this.weaponArr.length; i++){
+            if( this.getId() == this.weaponArr[i].getId()){
+                this.weapon = this.weaponArr[i];
+            }else{    
+                this.weapon;
+            }           
+         }
+         console.log(this.name+ ' takes the WOW : '+ this.weapon.name);
 
     }
     newPos(){
@@ -119,8 +146,6 @@ class Player extends Component {
     moveRight(){
         this.posX += this.w;
     }
-              
-            
     // drawPlayer(context){// this take the global context variable to draw player
     //     context.fillStyle = this.color;
     //     context.fillRect(this.x, this.y, this.w, this.h);
@@ -133,8 +158,8 @@ class Player extends Component {
 //========================THE GAME================================
 window.addEventListener("load", WindowLoaded, false);
 
-//this Debugger would catch with a function/behavior 
-//relative message to the console
+//this Debugger would post with a console log
+//relative message to the state of game
 var Debugger = function () { };
 Debugger.log = function (message) {
    try {
@@ -148,7 +173,7 @@ Debugger.log = function (message) {
 //Once the window is loaded this function would execute the game
 function WindowLoaded (){
     avaGame();
-    
+
 }
 
 function avaGame(){    
@@ -173,13 +198,24 @@ function avaGame(){
     // lets crete the game area
     let gameArea = new Map(10,10,64,64,map,context);
 
-    let weapons = [];//into this array weapon[0] is the basic weapon for the base player damage
+    let weapons = [];//into this array (weapon[0]) is the basic weapon for the base player damage
     let players = [];
 
     let tileSheet = new Image();//Actually this is the tilesheet image for the map
     tileSheet.addEventListener('load', drawGame, false);
     tileSheet.src = '../img/tilesheet.png'
 
+    let imgp1 = new Image();
+    imgp1.onload = imgLoaded();
+    imgp1.src = '../img/playerA.png';
+
+    let imgp2 = new Image();
+    imgp2.onload = imgLoaded();
+    imgp2.src =  '../img/playerB.png';
+
+    function imgLoaded(){
+        console.log('image loaded');
+    }
 
 
     //Now we must create some weapons to push on the weapons[] empty array
@@ -278,54 +314,68 @@ function avaGame(){
             break;
 
             case 72: // Key (H) to take weapon
-            getWeapon(players,weapons);
-            moveCounter +=4;
+            // getWeapon(players,weapons);
+            obj.getWeapon();
+            
+
             break;
 
         }
-        console.log('here the player is: '+playerId);
         if(moveCounter >= 3){
-            moveCounter = 0;
-            playerId ++;
 
+            playerId ++;
+            
+            moveCounter = 0;
+
+            
+
+            if (playerId >= players.length){
+                
+                 playerId = 0;
+            }
+            alert('Player '+(players[playerId].name)+ ' Turn!!');
             console.log('the player on Array is: '+playerId);
             console.log(players);
-
-            if (playerId == players.length){
-                
-                playerId = 0;
-            }
-            console.log('switch to player '+ (playerId +1));
-            console.log('the movecounter now: '+moveCounter);
+            // console.log('switch to player '+ (playerId +1));
+            // console.log('the movecounter now: '+moveCounter);
             
-            console.log('the movecounter then: '+moveCounter);
-        }
-
-        return playerId;
-    }
-
-
-    //the next function are activated on the keboard control (H) to take weapon
-
-    function getWeapon(playerArr,weapArray){
-        //loop to go inside the arrays of players[] and weapons[] to evaluate the coordinates
-        // of each object when player are over the weapon so this would return the 
-        //object to pass into the constructor of player
-        // If the coords are not equals return de default value of player the weapon[0] with base damage
-        for(let p = 0; p < playerArr.length; p++){
-            for(let i=0; i < weapArray.length; i++){
-                if( playerArr[p].x == weapArray[i].x && playerArr[p].y == weapArray[i].y){
-                    playerArr[p].weapon = weapArray[i];
-                }else{
-                    playerArr[p].weapon;
-                }           
-             }
-             console.log(playerArr[p].name+' did take the '+playerArr[p].weapon.name);
+            // console.log('the movecounter then: '+moveCounter);
         }
         
+        return playerId;
+    }
+    console.log('the pid is: '+playerId);
+
+    //the next function are activated on the keboard control (H) to take weapon
+    // THIS FUNCTION WAS INSERTED AS METHOD ON PLAYER CLASS
+    // function getWeapon(playerArr,weapArray){
+    //     //loop to go inside the arrays of players[] and weapons[] to evaluate the coordinates
+    //     // of each object when player are over the weapon so this would return the 
+    //     //object to pass into the constructor of player
+    //     // If the coords are not equals return de default value of player the weapon[0] with base damage
+    //     for(let p = 0; p < playerArr.length; p++){
+    //         for(let i=0; i < weapArray.length; i++){
+    //             if( playerArr[p].x == weapArray[i].x && playerArr[p].y == weapArray[i].y){
+    //                 playerArr[p].weapon = weapArray[i];
+    //             }else{
+    //                 playerArr[p].weapon;
+    //             }           
+    //          }
+    //          console.log(playerArr[p].name+' did take the '+playerArr[p].weapon.name);
+    //     }
+        
+    // }
+
+    function updWeapon(){
+        // console.log('Look the Id of first p '+p1.getId());
+        // console.log('Look the Id of first p '+p2.getId());
+        // console.log('Look the Id of weapon p '+weapons[1].getId());
+        if(p1.getId()== p2.getId()){
+            console.log('BOOOOOOOOOOOOOOOOOOOOOOOOOOOM');
+        }
     }
 
-  
+    
     //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
 
     function drawGame(){
@@ -337,25 +387,25 @@ function avaGame(){
             weapons[3].drawIt(context);
         }
         function drawPlayers(){
-            
-            p1.drawIt(context);
-            p2.drawIt(context);
             p1.newPos();
             p2.newPos();
+            p1.drawP(context,imgp1);
+            p2.drawP(context,imgp2);
+            
             // getWeapon(players,weapons);
             
         }
         
-       drawMap();
-       drawComponents();
-
-       drawPlayers();
+        drawMap();
+        drawComponents();
+        updWeapon();
+        drawPlayers();
 
     }
     //===========THE GAME LOOP============================
-
+    let myRaf;
     function updateGame(){
-        requestAnimationFrame(updateGame);
+        myRaf = requestAnimationFrame(updateGame);
 
         clearCanvas();//this clear the canvas
         
@@ -365,7 +415,7 @@ function avaGame(){
     
     
     // drawGame();
-    requestAnimationFrame(updateGame);
+    myRaf = requestAnimationFrame(updateGame);
     
 
 
