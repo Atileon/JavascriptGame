@@ -279,21 +279,6 @@ function avaGame(){
         // Debugger.log('clearing Canvas');
     }
 
-
-    // function drawMap(){
-
-    //     for(let rowId = 0; rowId<gameArea.rows; rowId++){
-    //         for(let colId = 0; colId<gameArea.cols; colId++){
-    //             // let tileId = Math.floor(Math.random()*100 + gameArea.mapIO); // lol
-    //             let tileId = gameArea.mapArr[rowId][colId] + gameArea.mapIO;
-    //             let srcX = Math.floor(tileId % 10) * 64;
-    //             let srcY = Math.floor(tileId / 10) * 64;
-    //             context.drawImage(tileSheet, srcX, srcY, 64,64, colId*64, rowId*64,64,64);
-
-    //         }                
-    //     }
-    // }
-
     //======================TURN MECHANISM=============================
     let moveCounter = 0;
     let playerId = 0;
@@ -386,7 +371,7 @@ function avaGame(){
         // console.log('Look the Id of first p '+p2.getId());
         // console.log('Look the Id of weapon p '+weapons[1].getId());
         if(p1.getId()== p2.getId()){
-            console.log('BOOOOOOOOOOOOOOOOOOOOOOOOOOOM');
+            console.log('BOOOOOOOOOOOOOOOOOOOOOOOOOOOM THE WINTER HAS COME!!!!');
         }
     }
 
