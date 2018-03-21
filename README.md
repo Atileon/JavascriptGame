@@ -97,7 +97,9 @@ Note that I've just explained the name and damage because the another values are
 
 ## The Player Class
 
+
 /play yeah
+
 
 Ehm!...well, now we can create a player with
 
@@ -123,7 +125,9 @@ which could __compare__ simply the __tile index__ of player with the __weapons__
 
 ### _The Battle_
 
+
 /play dangerzone
+
 
 :see_no_evil: Violence ... too much violence!!!
 
