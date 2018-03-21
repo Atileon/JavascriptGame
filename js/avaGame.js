@@ -20,11 +20,26 @@ class Map {
         this.rows = rows;
         this.tileW = tileW;
         this.tileH = tileH;
-        this.mapArr = arr; //this is for the map array
-        this.context = ctx;
+        this.mapArr = arr; //this is for the map array which would be a bidimensional array 'arr[][]'
+        this.context = ctx;//canvas context passed into a variable
         this.mapIO = -1; //this is the index offset for the map array
     }
-    
+    drawMap(tileSheet){
+        // This method will draw the map 
+        // and there's need just of a tilesheet image declared into a variable
+        // to pass into this method
+
+        for(let rowId = 0; rowId<this.rows; rowId++){
+            for(let colId = 0; colId<this.cols; colId++){
+                // let tileId = Math.floor(Math.random()*100 + gameArea.mapIO); // lol
+                let tileId = this.mapArr[rowId][colId] + this.mapIO;
+                let srcX = Math.floor(tileId % 10) * 64;
+                let srcY = Math.floor(tileId / 10) * 64;
+                this.context.drawImage(tileSheet, srcX, srcY, 64,64, colId*64, rowId*64,64,64);
+
+            }                
+        }
+    }
 }
 
 class Component{
@@ -265,19 +280,19 @@ function avaGame(){
     }
 
 
-    function drawMap(){
+    // function drawMap(){
 
-        for(let rowId = 0; rowId<gameArea.rows; rowId++){
-            for(let colId = 0; colId<gameArea.cols; colId++){
-                // let tileId = Math.floor(Math.random()*100 + gameArea.mapIO); // lol
-                let tileId = gameArea.mapArr[rowId][colId] + gameArea.mapIO;
-                let srcX = Math.floor(tileId % 10) * 64;
-                let srcY = Math.floor(tileId / 10) * 64;
-                context.drawImage(tileSheet, srcX, srcY, 64,64, colId*64, rowId*64,64,64);
+    //     for(let rowId = 0; rowId<gameArea.rows; rowId++){
+    //         for(let colId = 0; colId<gameArea.cols; colId++){
+    //             // let tileId = Math.floor(Math.random()*100 + gameArea.mapIO); // lol
+    //             let tileId = gameArea.mapArr[rowId][colId] + gameArea.mapIO;
+    //             let srcX = Math.floor(tileId % 10) * 64;
+    //             let srcY = Math.floor(tileId / 10) * 64;
+    //             context.drawImage(tileSheet, srcX, srcY, 64,64, colId*64, rowId*64,64,64);
 
-            }                
-        }
-    }
+    //         }                
+    //     }
+    // }
 
     //======================TURN MECHANISM=============================
     let moveCounter = 0;
@@ -396,7 +411,7 @@ function avaGame(){
             
         }
         
-        drawMap();
+        gameArea.drawMap(tileSheet);
         drawComponents();
         updWeapon();
         drawPlayers();
