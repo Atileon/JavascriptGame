@@ -120,7 +120,7 @@ class Player extends Component {
     drawP(context,img){// this take the global context variable to draw Component
         
         context.drawImage(img, this.x, this.y, this.w, this.h);
-        context.setTransform(1, 0, 0, 1, 0, 0);
+        // context.setTransform(1, 0, 0, 1, 0, 0);
     }
     getWeapon(){
         for(let i=0; i < this.weaponArr.length; i++){
@@ -216,6 +216,8 @@ function avaGame(){
     let weapons = [];//into this array (weapon[0]) is the basic weapon for the base player damage
     let players = [];
 
+    let images = [];
+
     let tileSheet = new Image();//Actually this is the tilesheet image for the map
     tileSheet.addEventListener('load', drawGame, false);
     tileSheet.src = '../img/tilesheet.png'
@@ -231,7 +233,7 @@ function avaGame(){
     function imgLoaded(){
         console.log('image loaded');
     }
-
+    
 
     //Now we must create some weapons to push on the weapons[] empty array
     let tomatoe = new Weapon('b',0,0,64,64,'brown','tomatoe',10);
@@ -381,10 +383,14 @@ function avaGame(){
     function drawGame(){
 
         function drawComponents(){
-            weapons[0].drawIt(context);
-            weapons[1].drawIt(context);
-            weapons[2].drawIt(context);
-            weapons[3].drawIt(context);
+
+            for(let weapon of weapons){// Thanks ES2015 :)
+                weapon.drawIt(context);
+            }
+            // weapons[0].drawIt(context);
+            // weapons[1].drawIt(context);
+            // weapons[2].drawIt(context);
+            // weapons[3].drawIt(context);
         }
         function drawPlayers(){
             p1.newPos();
