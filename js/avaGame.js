@@ -41,7 +41,7 @@ class Map {
         }
     }
 }
-
+//TODO try to modify directly the values on this component class
 class Component{
     constructor(area = 'a',x,y,width,height,color){
         // The area variable will set the area where the component would be deployed
@@ -106,17 +106,26 @@ class Weapon extends Component {
 }
 
 class Player extends Component {
+    
     constructor(area,x,y,width,height,color,name,weapons){
         super(area,x,y,width,height,color);
-
+        
         this.name = name;
         this.health = 100;
         this.weaponArr = weapons;
         this.weapon = this.weaponArr[0];
+        this.damageP = this.weapon.damage;
         this.posX = this.x;//initial position on X
         this.posY = this.y;//initial position on Y
-        // this.upgradeWeapon = this.weaponNew();
+        // this.upgradeWeapon = this.weaponNew();s
     }
+    
+    // sanatate(){
+    //     let calcDam = this.health - this.weapon.damage;
+    //     this.health = calcDam;
+    //     return this.health;
+        
+    // }
     drawP(context,img){// this take the global context variable to draw Component
         
         context.drawImage(img, this.x, this.y, this.w, this.h);
@@ -126,6 +135,7 @@ class Player extends Component {
         for(let i=0; i < this.weaponArr.length; i++){
             if( this.getId() == this.weaponArr[i].getId()){
                 this.weapon = this.weaponArr[i];
+                this.damageP = this.weaponArr[i].damage;
             }else{    
                 this.weapon;
             }           
@@ -160,6 +170,16 @@ class Player extends Component {
     }
     moveRight(){
         this.posX += this.w;
+    }
+    // get attack(){
+    //     return this.enemy.health;
+    // }
+    attack(nemesis){
+        this.enemy = nemesis;
+        let totalDam = this.enemy.health - this.damageP;
+        this.enemy.health = totalDam;
+        return this.enemy.health;
+        console.log(enemy.health);
     }
     // drawPlayer(context){// this take the global context variable to draw player
     //     context.fillStyle = this.color;
@@ -197,16 +217,16 @@ function avaGame(){
     let context = canvas.getContext('2d');
 
     let map = [
-        [21,21,34,23,23,35,21,21,21,21],
-        [21,21,22,21,21,22,21,21,21,21],
-        [21,34,26,23,23,32,23,23,35,21],
-        [21,22,31,21,31,22,21,21,22,21],
-        [21,36,27,23,23,33,23,23,25,21],
-        [21,21,22,21,21,22,21,21,22,21],
-        [21,34,26,35,21,22,21,21,22,31],
-        [21,22,21,36,27,26,27,23,26,35],
-        [21,22,21,21,22,31,22,21,31,22],
-        [21,36,23,23,37,21,36,23,23,37]
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
     ];
 
 
@@ -319,9 +339,10 @@ function avaGame(){
             // getWeapon(players,weapons);
             obj.getWeapon();
             
-
             break;
 
+            
+           
         }
         if(moveCounter >= 3){
 
@@ -367,17 +388,91 @@ function avaGame(){
     //     }
         
     // }
-
-    function updWeapon(){
-        // console.log('Look the Id of first p '+p1.getId());
-        // console.log('Look the Id of first p '+p2.getId());
-        // console.log('Look the Id of weapon p '+weapons[1].getId());
-        if(p1.getId()== p2.getId()){
-            console.log('BOOOOOOOOOOOOOOOOOOOOOOOOOOOM THE WINTER HAS COME!!!!');
+    let keydown = {
+        'up': false,
+        'down': false,
+        'left': false,
+        'right': false,
+        'attack':false,
+        'defense': false,
+        'take': false,
+        'switch':false
+    };
+    window.onkeydown = function(e) {
+        switch(e.keyCode) {
+            case 65:
+                keydown.left = true;
+                break;
+            case 68:
+                keydown.right = true;
+                break;
+            case 83:
+                keydown.down = true;
+                break;
+            case 87:
+                keydown.up = true;
+                break;
+            case 78:
+                keydown.attack = true;
+                break;
         }
-    }
-
+      }
     
+      window.onkeyup = function(e) {
+        switch(e.keyCode) {
+            case 65:
+                keydown.left = false;
+                break;
+            case 68:
+                keydown.right = false;
+                break;
+            case 83:
+                keydown.down = false;
+                break;
+            case 87:
+                keydown.up = false;
+                break;
+            case 78: 
+                keydown.attack = false;
+                break;
+        }
+      }
+
+      function theWar(obj1,obj2){
+          let fight = false;
+          let pTurn = 0;
+          if(pTurn > 1){
+              return pTurn = 0;
+          }
+
+          function theBattle(player,enemy){
+            if (keydown.attack == true){
+                player.attack(enemy);
+                console.log(enemy.health);
+                pTurn++;
+            }
+          }
+
+        if (obj1.getId()== obj2.getId()){
+            fight = true;
+            // console.log(fight);
+            
+            if(fight == true && pTurn == 0){
+                theBattle(obj1,obj2);
+            }else if(fight == true && pTurn ==1){
+                theBattle(obj2, obj1);
+            }else {
+                fight = false;
+            }
+            console.log('The Battle will begins!');
+            
+        }
+
+      }
+
+
+
+
     //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
 
     function drawGame(){
@@ -397,6 +492,7 @@ function avaGame(){
             p2.newPos();
             p1.drawP(context,imgp1);
             p2.drawP(context,imgp2);
+            theWar(p1,p2);
             
             // getWeapon(players,weapons);
             
@@ -404,7 +500,6 @@ function avaGame(){
         
         gameArea.drawMap(tileSheet);
         drawComponents();
-        updWeapon();
         drawPlayers();
 
     }
