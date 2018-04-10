@@ -535,30 +535,33 @@ function avaGame(){
         gameArea.drawMap(tileSheet);
         drawComponents();
         drawPlayers();
-        gameOver();
     }
+
+    //=============The Game Over===============
+
+    function gameOver(){
+        if(p1.health <= 0 || p2.health <= 0){
+            alert('GAME OVER');
+            location.reload();
+        }
+    }
+
     //===========THE GAME LOOP============================
     let myRaf;
     function updateGame(){
         myRaf = requestAnimationFrame(updateGame);
         gameOver();
+
         clearCanvas();//this clear the canvas
         
         drawGame();//this draw the canvas again with positions updated
-        
     }
-    //=============The Game Over===============
-    function gameOver(){
-        if(p1.health <= 0 || p2.health <= 0){
-            alert('GAME OVER!!!! Restart Game');
-            p1.health = 100;
-            p2.health = 100;
-        }
-    }
+
     
-    
-    // drawGame();
     myRaf = requestAnimationFrame(updateGame);
+
+    
+    
     
 
 
