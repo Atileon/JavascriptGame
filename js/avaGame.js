@@ -43,7 +43,7 @@ class Map {
 }
 //TODO try to modify directly the values on this component class
 class Component{
-    constructor(area = 'a',x,y,width,height,color){
+    constructor(area = 'a',width,height,color){
         // The area variable will set the area where the component would be deployed
         this.area = area;
         //next 4 lines to set a random position for the players
@@ -97,8 +97,8 @@ class Component{
 }
 
 class Weapon extends Component {
-    constructor(area,x,y,width,height,color,name, damage){
-        super(area,x,y,width,height,color);
+    constructor(area,width,height,color,name, damage){
+        super(area,width,height,color);
         this.name = name;
         this.damage = damage;
     }
@@ -107,17 +107,22 @@ class Weapon extends Component {
 
 class Player extends Component {
     
-    constructor(area,x,y,width,height,color,name,weapons){
-        super(area,x,y,width,height,color);
-        
+    constructor(area,width,height,color,name,weapons){
+        super(area,width,height,color);
+        this.enemy = this.nemesis;
         this.name = name;
         this.health = 100;
         this.weaponArr = weapons;
         this.weapon = this.weaponArr[0];
         this.damageP = this.weapon.damage;
-        this.posX = this.x;//initial position on X
-        this.posY = this.y;//initial position on Y
+        this.defense = false;
         // this.upgradeWeapon = this.weaponNew();s
+    }
+    get nemesis(){
+       return this.enemy;
+    }
+    set nemesis(val){
+        this.enemy = val;
     }
     
     // sanatate(){
@@ -144,8 +149,8 @@ class Player extends Component {
 
     }
     newPos(){
-        this.x = this.posX;//position updated on X
-        this.y = this.posY;//position updated on Y
+        this.x = this.x;//position updated on X
+        this.y = this.y;//position updated on Y
 
         //this if else condition would prevent to get out of the canvas
         if (this.x < 0){
@@ -158,28 +163,39 @@ class Player extends Component {
             this.moveUp();
         }
     }
+    healthPlayer(){
+        this.health = this.health;
+        console.log(this.health);
+    }
     
     moveUp(){
-        this.posY -= this.h;
+        this.y -= this.h;
     }
     moveDown(){
-        this.posY += this.h;
+        this.y += this.h;
     }
     moveLeft(){
-        this.posX -= this.w;
+        this.x -= this.w;
     }
     moveRight(){
-        this.posX += this.w;
+        this.x += this.w;
     }
-    // get attack(){
-    //     return this.enemy.health;
-    // }
-    attack(nemesis){
-        this.enemy = nemesis;
-        let totalDam = this.enemy.health - this.damageP;
-        this.enemy.health = totalDam;
-        return this.enemy.health;
-        console.log(enemy.health);
+    
+    attack(){
+        
+        this.enemy.hit = this.damageP;        
+        if(this.enemy.defense){
+            this.enemy.hit = (this.damageP /2);
+            this.enemy.defense = false;
+        }
+        this.enemy.health -= this.enemy.hit;
+        console.log('hit on: '+this.enemy.name+ ' is '+this.enemy.hit);
+        console.log('enemy health: '+this.enemy.health);
+        
+    }
+    shield(){
+        this.defense = true;
+        console.log('the shield is: '+this.defense);
     }
     // drawPlayer(context){// this take the global context variable to draw player
     //     context.fillStyle = this.color;
@@ -256,13 +272,13 @@ function avaGame(){
     
 
     //Now we must create some weapons to push on the weapons[] empty array
-    let tomatoe = new Weapon('b',0,0,64,64,'brown','tomatoe',10);
+    let tomatoe = new Weapon('b',64,64,'brown','tomatoe',10);
     weapons.push(tomatoe);
-    let banana = new Weapon('b',0,0,64,64,'yellow','banana',50);
+    let banana = new Weapon('b',64,64,'yellow','banana',50);
     weapons.push(banana);
-    let pera = new Weapon('b',0,0,64,64,'red','pera',60);
+    let pera = new Weapon('b',64,64,'red','pera',60);
     weapons.push(pera);
-    let papaya = new Weapon('b',0,0,64,64,'orange','papaya',60);
+    let papaya = new Weapon('b',64,64,'orange','papaya',60);
     weapons.push(papaya);
 
     Debugger.log('weapons had been created: ');
@@ -270,10 +286,13 @@ function avaGame(){
 
     //As the weapons Objects we could push the players into an empty array
     // in this case the players[] array
-    let carlitos = new Player('a',0,0,64,64,'black','carlitos',weapons);
+    let carlitos = new Player('a',64,64,'black','carlitos',weapons);
     players.push(carlitos);
-    let lucifera = new Player('c',0,0,64,64,'white','Lucifera',weapons);
+    let lucifera = new Player('c',64,64,'white','Lucifera',weapons);
     players.push(lucifera);
+
+    carlitos.nemesis = lucifera;
+    lucifera.nemesis = carlitos;
 
     Debugger.log('players are on the arena: ');
     console.log(players);
@@ -338,10 +357,17 @@ function avaGame(){
             case 72: // Key (H) to take weapon
             // getWeapon(players,weapons);
             obj.getWeapon();
-            
             break;
 
+            case 78:
+            obj.attack();
+            moveCounter +=3;
+            break;
             
+            case 77:
+            obj.shield();
+            moveCounter +=3;
+            break;
            
         }
         if(moveCounter >= 3){
@@ -388,83 +414,92 @@ function avaGame(){
     //     }
         
     // }
-    let keydown = {
-        'up': false,
-        'down': false,
-        'left': false,
-        'right': false,
-        'attack':false,
-        'defense': false,
-        'take': false,
-        'switch':false
-    };
-    window.onkeydown = function(e) {
-        switch(e.keyCode) {
-            case 65:
-                keydown.left = true;
-                break;
-            case 68:
-                keydown.right = true;
-                break;
-            case 83:
-                keydown.down = true;
-                break;
-            case 87:
-                keydown.up = true;
-                break;
-            case 78:
-                keydown.attack = true;
-                break;
-        }
-      }
+
+    // let keydown = {
+    //     'up': false,
+    //     'down': false,
+    //     'left': false,
+    //     'right': false,
+    //     'attack':false,
+    //     'defense': false,
+    //     'take': false,
+    //     'switch':false
+    // };
+    // window.onkeydown = function(e) {
+    //     switch(e.keyCode) {
+    //         case 65:
+    //             keydown.left = true;
+    //             break;
+    //         case 68:
+    //             keydown.right = true;
+    //             break;
+    //         case 83:
+    //             keydown.down = true;
+    //             break;
+    //         case 87:
+    //             keydown.up = true;
+    //             break;
+    //         case 78:
+    //             keydown.attack = true;
+    //             console.log('key pressed');
+    //             break;
+    //     }
+    //   }
     
-      window.onkeyup = function(e) {
-        switch(e.keyCode) {
-            case 65:
-                keydown.left = false;
-                break;
-            case 68:
-                keydown.right = false;
-                break;
-            case 83:
-                keydown.down = false;
-                break;
-            case 87:
-                keydown.up = false;
-                break;
-            case 78: 
-                keydown.attack = false;
-                break;
-        }
-      }
+    //   window.onkeyup = function(e) {
+    //     switch(e.keyCode) {
+    //         case 65:
+    //             keydown.left = false;
+    //             break;
+    //         case 68:
+    //             keydown.right = false;
+    //             break;
+    //         case 83:
+    //             keydown.down = false;
+    //             break;
+    //         case 87:
+    //             keydown.up = false;
+    //             break;
+    //         case 78: 
+    //             keydown.attack = false;
+    //             break;
+    //     }
+    //   }
+
 
       function theWar(obj1,obj2){
           let fight = false;
-          let pTurn = 0;
-          if(pTurn > 1){
-              return pTurn = 0;
+          let pTurn =0;
+          if(pTurn > 2){
+             pTurn = 0;
           }
 
           function theBattle(player,enemy){
             if (keydown.attack == true){
-                player.attack(enemy);
-                console.log(enemy.health);
-                pTurn++;
+                console.log('is attack');
+                player.attack= enemy;
+                player.attack;
+                console.log('the player is: '+player.name);
+                
+                pTurn ++;
+                console.log(pTurn);
+
             }
           }
 
         if (obj1.getId()== obj2.getId()){
             fight = true;
-            // console.log(fight);
+            console.log(fight);
             
             if(fight == true && pTurn == 0){
                 theBattle(obj1,obj2);
             }else if(fight == true && pTurn ==1){
-                theBattle(obj2, obj1);
+                theBattle(obj2, obj1)
+                console.log()
             }else {
                 fight = false;
             }
-            console.log('The Battle will begins!');
+            // console.log('The Battle will begins!');
             
         }
 
@@ -492,7 +527,6 @@ function avaGame(){
             p2.newPos();
             p1.drawP(context,imgp1);
             p2.drawP(context,imgp2);
-            theWar(p1,p2);
             
             // getWeapon(players,weapons);
             
@@ -501,18 +535,26 @@ function avaGame(){
         gameArea.drawMap(tileSheet);
         drawComponents();
         drawPlayers();
-
+        gameOver();
     }
     //===========THE GAME LOOP============================
     let myRaf;
     function updateGame(){
         myRaf = requestAnimationFrame(updateGame);
-
+        gameOver();
         clearCanvas();//this clear the canvas
         
         drawGame();//this draw the canvas again with positions updated
+        
     }
-    //============================
+    //=============The Game Over===============
+    function gameOver(){
+        if(p1.health <= 0 || p2.health <= 0){
+            alert('GAME OVER!!!! Restart Game');
+            p1.health = 100;
+            p2.health = 100;
+        }
+    }
     
     
     // drawGame();
