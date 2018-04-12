@@ -299,6 +299,8 @@ function avaGame(){
 
     let p1 = carlitos;
     let p2 = lucifera;
+
+    let fight = false;
     //============= position on map displayed on console ================
     console.log('the id of player 1 is: '+p1.tileId);
     console.log('the id of player 2 is: '+p2.tileId);
@@ -360,23 +362,35 @@ function avaGame(){
             break;
 
             case 78:
-            obj.attack();
+            if(fight){
+                obj.attack();
             moveCounter +=3;
             break;
-            
+            }
+                        
             case 77:
-            obj.shield();
+            if(fight){
+                obj.shield();
             moveCounter +=3;
             break;
+            }
+            
            
         }
+        // ==== the tile collision for players fight event
+        if(p1.getId() == p2.getId()){
+            fight = true;
+            console.log('fight!!!!');
+        }else{
+            fight = false;
+            console.log('fight false');
+        }
+
+        // this could increment the movecounter to switch player
         if(moveCounter >= 3){
 
             playerId ++;
-            
             moveCounter = 0;
-
-            
 
             if (playerId >= players.length){
                 
@@ -385,10 +399,7 @@ function avaGame(){
             alert('Player '+(players[playerId].name)+ ' Turn!!');
             console.log('the player on Array is: '+playerId);
             console.log(players);
-            // console.log('switch to player '+ (playerId +1));
-            // console.log('the movecounter now: '+moveCounter);
-            
-            // console.log('the movecounter then: '+moveCounter);
+           
         }
         
         return playerId;
