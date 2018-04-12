@@ -467,43 +467,43 @@ function avaGame(){
     //   }
 
 
-      function theWar(obj1,obj2){
-          let fight = false;
-          let pTurn =0;
-          if(pTurn > 2){
-             pTurn = 0;
-          }
+    //   function theWar(obj1,obj2){
+    //       let fight = false;
+    //       let pTurn =0;
+    //       if(pTurn > 2){
+    //          pTurn = 0;
+    //       }
 
-          function theBattle(player,enemy){
-            if (keydown.attack == true){
-                console.log('is attack');
-                player.attack= enemy;
-                player.attack;
-                console.log('the player is: '+player.name);
+    //       function theBattle(player,enemy){
+    //         if (keydown.attack == true){
+    //             console.log('is attack');
+    //             player.attack= enemy;
+    //             player.attack;
+    //             console.log('the player is: '+player.name);
                 
-                pTurn ++;
-                console.log(pTurn);
+    //             pTurn ++;
+    //             console.log(pTurn);
 
-            }
-          }
+    //         }
+    //       }
 
-        if (obj1.getId()== obj2.getId()){
-            fight = true;
-            console.log(fight);
+    //     if (obj1.getId()== obj2.getId()){
+    //         fight = true;
+    //         console.log(fight);
             
-            if(fight == true && pTurn == 0){
-                theBattle(obj1,obj2);
-            }else if(fight == true && pTurn ==1){
-                theBattle(obj2, obj1)
-                console.log()
-            }else {
-                fight = false;
-            }
-            // console.log('The Battle will begins!');
+    //         if(fight == true && pTurn == 0){
+    //             theBattle(obj1,obj2);
+    //         }else if(fight == true && pTurn ==1){
+    //             theBattle(obj2, obj1)
+    //             console.log()
+    //         }else {
+    //             fight = false;
+    //         }
+    //         // console.log('The Battle will begins!');
             
-        }
+    //     }
 
-      }
+    //   }
 
 
 
