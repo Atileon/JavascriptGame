@@ -41,9 +41,9 @@ class Map {
         }
     }
 }
-
+//TODO try to modify directly the values on this component class
 class Component{
-    constructor(area = 'a',x,y,width,height,color){
+    constructor(area = 'a',width,height,color){
         // The area variable will set the area where the component would be deployed
         this.area = area;
         //next 4 lines to set a random position for the players
@@ -97,8 +97,8 @@ class Component{
 }
 
 class Weapon extends Component {
-    constructor(area,x,y,width,height,color,name, damage){
-        super(area,x,y,width,height,color);
+    constructor(area,width,height,color,name, damage){
+        super(area,width,height,color);
         this.name = name;
         this.damage = damage;
     }
@@ -106,17 +106,31 @@ class Weapon extends Component {
 }
 
 class Player extends Component {
-    constructor(area,x,y,width,height,color,name,weapons){
-        super(area,x,y,width,height,color);
-
+    
+    constructor(area,width,height,color,name,weapons){
+        super(area,width,height,color);
+        this.enemy = this.nemesis;
         this.name = name;
         this.health = 100;
         this.weaponArr = weapons;
         this.weapon = this.weaponArr[0];
-        this.posX = this.x;//initial position on X
-        this.posY = this.y;//initial position on Y
-        // this.upgradeWeapon = this.weaponNew();
+        this.damageP = this.weapon.damage;
+        this.defense = false;
+        // this.upgradeWeapon = this.weaponNew();s
     }
+    get nemesis(){
+       return this.enemy;
+    }
+    set nemesis(val){
+        this.enemy = val;
+    }
+    
+    // sanatate(){
+    //     let calcDam = this.health - this.weapon.damage;
+    //     this.health = calcDam;
+    //     return this.health;
+        
+    // }
     drawP(context,img){// this take the global context variable to draw Component
         
         context.drawImage(img, this.x, this.y, this.w, this.h);
@@ -126,6 +140,7 @@ class Player extends Component {
         for(let i=0; i < this.weaponArr.length; i++){
             if( this.getId() == this.weaponArr[i].getId()){
                 this.weapon = this.weaponArr[i];
+                this.damageP = this.weaponArr[i].damage;
             }else{    
                 this.weapon;
             }           
@@ -134,8 +149,8 @@ class Player extends Component {
 
     }
     newPos(){
-        this.x = this.posX;//position updated on X
-        this.y = this.posY;//position updated on Y
+        this.x = this.x;//position updated on X
+        this.y = this.y;//position updated on Y
 
         //this if else condition would prevent to get out of the canvas
         if (this.x < 0){
@@ -148,18 +163,39 @@ class Player extends Component {
             this.moveUp();
         }
     }
+    healthPlayer(){
+        this.health = this.health;
+        console.log(this.health);
+    }
     
     moveUp(){
-        this.posY -= this.h;
+        this.y -= this.h;
     }
     moveDown(){
-        this.posY += this.h;
+        this.y += this.h;
     }
     moveLeft(){
-        this.posX -= this.w;
+        this.x -= this.w;
     }
     moveRight(){
-        this.posX += this.w;
+        this.x += this.w;
+    }
+    
+    attack(){
+        
+        this.enemy.hit = this.damageP;        
+        if(this.enemy.defense){
+            this.enemy.hit = (this.damageP /2);
+            this.enemy.defense = false;
+        }
+        this.enemy.health -= this.enemy.hit;
+        console.log('hit on: '+this.enemy.name+ ' is '+this.enemy.hit);
+        console.log('enemy health: '+this.enemy.health);
+        
+    }
+    shield(){
+        this.defense = true;
+        console.log('the shield is: '+this.defense);
     }
     // drawPlayer(context){// this take the global context variable to draw player
     //     context.fillStyle = this.color;
@@ -197,16 +233,16 @@ function avaGame(){
     let context = canvas.getContext('2d');
 
     let map = [
-        [21,21,34,23,23,35,21,21,21,21],
-        [21,21,22,21,21,22,21,21,21,21],
-        [21,34,26,23,23,32,23,23,35,21],
-        [21,22,31,21,31,22,21,21,22,21],
-        [21,36,27,23,23,33,23,23,25,21],
-        [21,21,22,21,21,22,21,21,22,21],
-        [21,34,26,35,21,22,21,21,22,31],
-        [21,22,21,36,27,26,27,23,26,35],
-        [21,22,21,21,22,31,22,21,31,22],
-        [21,36,23,23,37,21,36,23,23,37]
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
+        [21,21,21,21,21,21,21,21,21,21],
     ];
 
 
@@ -236,13 +272,13 @@ function avaGame(){
     
 
     //Now we must create some weapons to push on the weapons[] empty array
-    let tomatoe = new Weapon('b',0,0,64,64,'brown','tomatoe',10);
+    let tomatoe = new Weapon('b',64,64,'brown','tomatoe',10);
     weapons.push(tomatoe);
-    let banana = new Weapon('b',0,0,64,64,'yellow','banana',50);
+    let banana = new Weapon('b',64,64,'yellow','banana',50);
     weapons.push(banana);
-    let pera = new Weapon('b',0,0,64,64,'red','pera',60);
+    let pera = new Weapon('b',64,64,'red','pera',60);
     weapons.push(pera);
-    let papaya = new Weapon('b',0,0,64,64,'orange','papaya',60);
+    let papaya = new Weapon('b',64,64,'orange','papaya',60);
     weapons.push(papaya);
 
     Debugger.log('weapons had been created: ');
@@ -250,10 +286,13 @@ function avaGame(){
 
     //As the weapons Objects we could push the players into an empty array
     // in this case the players[] array
-    let carlitos = new Player('a',0,0,64,64,'black','carlitos',weapons);
+    let carlitos = new Player('a',64,64,'black','carlitos',weapons);
     players.push(carlitos);
-    let lucifera = new Player('c',0,0,64,64,'white','Lucifera',weapons);
+    let lucifera = new Player('c',64,64,'white','Lucifera',weapons);
     players.push(lucifera);
+
+    carlitos.nemesis = lucifera;
+    lucifera.nemesis = carlitos;
 
     Debugger.log('players are on the arena: ');
     console.log(players);
@@ -318,10 +357,18 @@ function avaGame(){
             case 72: // Key (H) to take weapon
             // getWeapon(players,weapons);
             obj.getWeapon();
-            
-
             break;
 
+            case 78:
+            obj.attack();
+            moveCounter +=3;
+            break;
+            
+            case 77:
+            obj.shield();
+            moveCounter +=3;
+            break;
+           
         }
         if(moveCounter >= 3){
 
@@ -368,16 +415,99 @@ function avaGame(){
         
     // }
 
-    function updWeapon(){
-        // console.log('Look the Id of first p '+p1.getId());
-        // console.log('Look the Id of first p '+p2.getId());
-        // console.log('Look the Id of weapon p '+weapons[1].getId());
-        if(p1.getId()== p2.getId()){
-            console.log('BOOOOOOOOOOOOOOOOOOOOOOOOOOOM THE WINTER HAS COME!!!!');
-        }
-    }
-
+    // let keydown = {
+    //     'up': false,
+    //     'down': false,
+    //     'left': false,
+    //     'right': false,
+    //     'attack':false,
+    //     'defense': false,
+    //     'take': false,
+    //     'switch':false
+    // };
+    // window.onkeydown = function(e) {
+    //     switch(e.keyCode) {
+    //         case 65:
+    //             keydown.left = true;
+    //             break;
+    //         case 68:
+    //             keydown.right = true;
+    //             break;
+    //         case 83:
+    //             keydown.down = true;
+    //             break;
+    //         case 87:
+    //             keydown.up = true;
+    //             break;
+    //         case 78:
+    //             keydown.attack = true;
+    //             console.log('key pressed');
+    //             break;
+    //     }
+    //   }
     
+    //   window.onkeyup = function(e) {
+    //     switch(e.keyCode) {
+    //         case 65:
+    //             keydown.left = false;
+    //             break;
+    //         case 68:
+    //             keydown.right = false;
+    //             break;
+    //         case 83:
+    //             keydown.down = false;
+    //             break;
+    //         case 87:
+    //             keydown.up = false;
+    //             break;
+    //         case 78: 
+    //             keydown.attack = false;
+    //             break;
+    //     }
+    //   }
+
+
+      function theWar(obj1,obj2){
+          let fight = false;
+          let pTurn =0;
+          if(pTurn > 2){
+             pTurn = 0;
+          }
+
+          function theBattle(player,enemy){
+            if (keydown.attack == true){
+                console.log('is attack');
+                player.attack= enemy;
+                player.attack;
+                console.log('the player is: '+player.name);
+                
+                pTurn ++;
+                console.log(pTurn);
+
+            }
+          }
+
+        if (obj1.getId()== obj2.getId()){
+            fight = true;
+            console.log(fight);
+            
+            if(fight == true && pTurn == 0){
+                theBattle(obj1,obj2);
+            }else if(fight == true && pTurn ==1){
+                theBattle(obj2, obj1)
+                console.log()
+            }else {
+                fight = false;
+            }
+            // console.log('The Battle will begins!');
+            
+        }
+
+      }
+
+
+
+
     //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
 
     function drawGame(){
@@ -404,24 +534,34 @@ function avaGame(){
         
         gameArea.drawMap(tileSheet);
         drawComponents();
-        updWeapon();
         drawPlayers();
-
     }
+
+    //=============The Game Over===============
+
+    function gameOver(){
+        if(p1.health <= 0 || p2.health <= 0){
+            alert('GAME OVER');
+            location.reload();
+        }
+    }
+
     //===========THE GAME LOOP============================
     let myRaf;
     function updateGame(){
         myRaf = requestAnimationFrame(updateGame);
+        gameOver();
 
         clearCanvas();//this clear the canvas
         
         drawGame();//this draw the canvas again with positions updated
     }
-    //============================
+
     
-    
-    // drawGame();
     myRaf = requestAnimationFrame(updateGame);
+
+    
+    
     
 
 
