@@ -2,7 +2,7 @@
 // a main class or function to recall the game itself
 //Into the game there must be:
 //    -A class Map to generate a map from an array
-//    -A class Component to generalize position an width for any element
+//    -A class Component to generalize position an dimensions for any element
 //    -An extended from Component class for players 
 //    -An extended from Component class for weapons
 //
@@ -41,13 +41,13 @@ class Map {
         }
     }
 }
-//TODO try to modify directly the values on this component class
+
 class Component{
     constructor(area = 'a',width,height,color){
         // The area variable will set the area where the component would be deployed
         this.area = area;
-        //next 4 lines to set a random position for the players
-        // let tileId = Math.floor(Math.random()*100-1);//This because we are assuming visualy that there are 100 cells but on array are just 99
+
+        //next 3 lines to set a random position for the players
         this.startId = this.startArea();// this simply to set an tile to deploy component followin the starArea method
         this.x = Math.floor(this.startId % 10)*64;//value on X axis
         this.y = Math.floor(this.startId / 10)*64;//value on Y axis
@@ -56,7 +56,6 @@ class Component{
         this.h = height;
         this.color = color;
 
-        
         this.tileId = this.getId();
     }
     getId(){
@@ -89,7 +88,8 @@ class Component{
         }
         return this.startId;
     }
-    drawIt(context){// this take the global context variable to draw Component
+    drawIt(){
+        let context = canvas.getContext('2d');
         context.fillStyle = this.color;
         context.fillRect(this.x, this.y, this.w, this.h);
     }
@@ -124,28 +124,54 @@ class Player extends Component {
     set nemesis(val){
         this.enemy = val;
     }
+    healthPlayer(){
+        this.health = this.health;
+        console.log(this.health);
+    }
+    attack(){
+        
+        this.enemy.hit = this.damageP;        
+        if(this.enemy.defense){
+            this.enemy.hit = (this.damageP /2);
+            this.enemy.defense = false;
+        }
+        this.enemy.health -= this.enemy.hit;
+        console.log('hit on: '+this.enemy.name+ ' is '+this.enemy.hit);
+        console.log('enemy health: '+this.enemy.health);
+        
+    }
+    shield(){
+        this.defense = true;
+        console.log('the shield is: '+this.defense);
+    }
     
-    // sanatate(){
-    //     let calcDam = this.health - this.weapon.damage;
-    //     this.health = calcDam;
-    //     return this.health;
-        
-    // }
-    drawP(context,img){// this take the global context variable to draw Component
-        
+    drawP(img){// this take the global context variable to draw Component
+        let context = canvas.getContext('2d');
         context.drawImage(img, this.x, this.y, this.w, this.h);
         // context.setTransform(1, 0, 0, 1, 0, 0);
     }
     getWeapon(){
+       
+
         for(let i=0; i < this.weaponArr.length; i++){
             if( this.getId() == this.weaponArr[i].getId()){
-                this.weapon = this.weaponArr[i];
+                let droped = this.weapon;// current weapon stashed on variable
+                this.weapon = this.weaponArr[i]; //this take the new weapon
+
                 this.damageP = this.weaponArr[i].damage;
+                console.log( this.weapon);
+                this.weaponArr[i] = droped;
+                this.weaponArr[i].x = this.x;
+                this.weaponArr[i].y = this.y;
+
+                this.weaponArr[i].drawIt();
+                console.log(this.weaponArr[i]);
+                
             }else{    
                 this.weapon;
             }           
          }
-         console.log(this.name+ ' takes the WOW : '+ this.weapon.name);
+         console.log(this.name+ ' takes the weapon : '+ this.weapon.name);
 
     }
     newPos(){
@@ -163,10 +189,6 @@ class Player extends Component {
             this.moveUp();
         }
     }
-    healthPlayer(){
-        this.health = this.health;
-        console.log(this.health);
-    }
     
     moveUp(){
         this.y -= this.h;
@@ -180,28 +202,6 @@ class Player extends Component {
     moveRight(){
         this.x += this.w;
     }
-    
-    attack(){
-        
-        this.enemy.hit = this.damageP;        
-        if(this.enemy.defense){
-            this.enemy.hit = (this.damageP /2);
-            this.enemy.defense = false;
-        }
-        this.enemy.health -= this.enemy.hit;
-        console.log('hit on: '+this.enemy.name+ ' is '+this.enemy.hit);
-        console.log('enemy health: '+this.enemy.health);
-        
-    }
-    shield(){
-        this.defense = true;
-        console.log('the shield is: '+this.defense);
-    }
-    // drawPlayer(context){// this take the global context variable to draw player
-    //     context.fillStyle = this.color;
-    //     context.fillRect(this.x, this.y, this.w, this.h);
-    // }
-    
     
 }
 
@@ -308,7 +308,7 @@ function avaGame(){
     console.log('the tile id of weapon  '+p1.weaponArr[1].tileId);
 
 
-    console.log('the id of '+ weapons[0].x+' is: '+weapons[0].tileId);
+    console.log('the id of '+ weapons[0].name+' is: '+weapons[0].tileId);
     console.log('the id of '+ weapons[1].name+' is: '+weapons[1].tileId);
     console.log('the id of '+ weapons[2].name+' is: '+weapons[2].tileId);
     console.log('the id of '+ weapons[3].name+' is: '+weapons[3].tileId);
@@ -352,23 +352,23 @@ function avaGame(){
             moveCounter +=1;
             break;
 
-            case 13:// Enter keyboard, this to switch immediatly to another player
+            // Enter keyboard, this to switch immediatly to another player
+            case 13:
             moveCounter +=3;
             break;
 
             case 72: // Key (H) to take weapon
-            // getWeapon(players,weapons);
             obj.getWeapon();
             break;
 
-            case 78:
+            case 78:// Key (N) to attack
             if(fight){
                 obj.attack();
             moveCounter +=3;
             break;
             }
                         
-            case 77:
+            case 77: // Key (M) to activate defense shield
             if(fight){
                 obj.shield();
             moveCounter +=3;
@@ -393,18 +393,18 @@ function avaGame(){
             moveCounter = 0;
 
             if (playerId >= players.length){
-                
                  playerId = 0;
             }
+
             alert('Player '+(players[playerId].name)+ ' Turn!!');
             console.log('the player on Array is: '+playerId);
             console.log(players);
-           
+
         }
         
         return playerId;
     }
-    console.log('the pid is: '+playerId);
+    // console.log('the pid is: '+playerId);
 
     //the next function are activated on the keboard control (H) to take weapon
     // THIS FUNCTION WAS INSERTED AS METHOD ON PLAYER CLASS
@@ -426,121 +426,32 @@ function avaGame(){
         
     // }
 
-    // let keydown = {
-    //     'up': false,
-    //     'down': false,
-    //     'left': false,
-    //     'right': false,
-    //     'attack':false,
-    //     'defense': false,
-    //     'take': false,
-    //     'switch':false
-    // };
-    // window.onkeydown = function(e) {
-    //     switch(e.keyCode) {
-    //         case 65:
-    //             keydown.left = true;
-    //             break;
-    //         case 68:
-    //             keydown.right = true;
-    //             break;
-    //         case 83:
-    //             keydown.down = true;
-    //             break;
-    //         case 87:
-    //             keydown.up = true;
-    //             break;
-    //         case 78:
-    //             keydown.attack = true;
-    //             console.log('key pressed');
-    //             break;
-    //     }
-    //   }
-    
-    //   window.onkeyup = function(e) {
-    //     switch(e.keyCode) {
-    //         case 65:
-    //             keydown.left = false;
-    //             break;
-    //         case 68:
-    //             keydown.right = false;
-    //             break;
-    //         case 83:
-    //             keydown.down = false;
-    //             break;
-    //         case 87:
-    //             keydown.up = false;
-    //             break;
-    //         case 78: 
-    //             keydown.attack = false;
-    //             break;
-    //     }
-    //   }
-
-
-    //   function theWar(obj1,obj2){
-    //       let fight = false;
-    //       let pTurn =0;
-    //       if(pTurn > 2){
-    //          pTurn = 0;
-    //       }
-
-    //       function theBattle(player,enemy){
-    //         if (keydown.attack == true){
-    //             console.log('is attack');
-    //             player.attack= enemy;
-    //             player.attack;
-    //             console.log('the player is: '+player.name);
-                
-    //             pTurn ++;
-    //             console.log(pTurn);
-
-    //         }
-    //       }
-
-    //     if (obj1.getId()== obj2.getId()){
-    //         fight = true;
-    //         console.log(fight);
-            
-    //         if(fight == true && pTurn == 0){
-    //             theBattle(obj1,obj2);
-    //         }else if(fight == true && pTurn ==1){
-    //             theBattle(obj2, obj1)
-    //             console.log()
-    //         }else {
-    //             fight = false;
-    //         }
-    //         // console.log('The Battle will begins!');
-            
-    //     }
-
-    //   }
-
-
-
-
     //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
 
     function drawGame(){
 
         function drawComponents(){
 
-            for(let weapon of weapons){// Thanks ES2015 :)
-                weapon.drawIt(context);
-            }
+            // for(let weapon of weapons){// Thanks ES2015 :)
+            //     if(!weapon[0]){
+            //         weapon.drawIt();
+            //     }
+            // }
             // weapons[0].drawIt(context);
-            // weapons[1].drawIt(context);
-            // weapons[2].drawIt(context);
-            // weapons[3].drawIt(context);
+            weapons[1].drawIt(context);
+            weapons[2].drawIt(context);
+            weapons[3].drawIt(context);
         }
         function drawPlayers(){
-            p1.newPos();
-            p2.newPos();
-            p1.drawP(context,imgp1);
-            p2.drawP(context,imgp2);
-            
-            // getWeapon(players,weapons);
-            
+
+            for(let player of players){
+                player.newPos();
+            }
+            // p1.newPos();
+            // p2.newPos();
+            p1.drawP(imgp1);
+            p2.drawP(imgp2);
+
         }
         
         gameArea.drawMap(tileSheet);
@@ -549,7 +460,8 @@ function avaGame(){
     }
 
     //=============The Game Over===============
-
+    //this just check for players health to get the Game over
+    // after the alert the browser will refresh begining a new battle
     function gameOver(){
         if(p1.health <= 0 || p2.health <= 0){
             alert('GAME OVER');
@@ -561,20 +473,12 @@ function avaGame(){
     let myRaf;
     function updateGame(){
         myRaf = requestAnimationFrame(updateGame);
-        gameOver();
-
+        gameOver(); 
         clearCanvas();//this clear the canvas
         
         drawGame();//this draw the canvas again with positions updated
     }
 
-    
     myRaf = requestAnimationFrame(updateGame);
-
-    
-    
-    
-
-
 
 }//end of game app
