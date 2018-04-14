@@ -104,6 +104,12 @@ class Weapon extends Component {
     }
     
 }
+class Obstacle extends Component{
+    constructor(area,width,height, color){
+        super(area,width,height,color);
+    }
+    
+}
 
 class Player extends Component {
     
@@ -116,6 +122,10 @@ class Player extends Component {
         this.weapon = this.weaponArr[0];
         this.damageP = this.weapon.damage;
         this.defense = false;
+
+        this.currentX = this.x;
+        console.log('current value of x ' +this.currentX);
+        this.currentY = this.y;
         // this.upgradeWeapon = this.weaponNew();s
     }
     get nemesis(){
@@ -151,7 +161,7 @@ class Player extends Component {
         // context.setTransform(1, 0, 0, 1, 0, 0);
     }
     getWeapon(){
-       
+    //    requestAnimationFrame(this.getWeapon);
 
         for(let i=0; i < this.weaponArr.length; i++){
             if( this.getId() == this.weaponArr[i].getId()){
@@ -159,7 +169,7 @@ class Player extends Component {
                 this.weapon = this.weaponArr[i]; //this take the new weapon
 
                 this.damageP = this.weaponArr[i].damage;
-                console.log( this.weapon);
+                console.log( this.weapon.name);
                 this.weaponArr[i] = droped;
                 this.weaponArr[i].x = this.x;
                 this.weaponArr[i].y = this.y;
@@ -175,6 +185,7 @@ class Player extends Component {
 
     }
     newPos(){
+
         this.x = this.x;//position updated on X
         this.y = this.y;//position updated on Y
 
@@ -188,8 +199,24 @@ class Player extends Component {
         }else if((this.y + this.h) > canvas.width){
             this.moveUp();
         }
+        // =================
+        // for(let i= 0; i < this.weaponArr.length;i++){
+            
+        //     if((this.x + this.w) > this.weaponArr[i].x
+        //         && this.x < (this.weaponArr[i].x + this.w)
+        //         && this.y == this.weaponArr[i].y){
+        //             console.log('current value of x now! ' +this.x);
+        //             this.x = this.x; 
+        //             this.y = this.y;
+        //         }
+        // }
     }
-    
+    stay(){
+        this.y += 0;
+        this.x += 0;
+        this.y -= 0;
+        this.x -= 0;
+    }
     moveUp(){
         this.y -= this.h;
     }
@@ -301,6 +328,7 @@ function avaGame(){
     let p2 = lucifera;
 
     let fight = false;
+    let dontMove = false;
     //============= position on map displayed on console ================
     console.log('the id of player 1 is: '+p1.tileId);
     console.log('the id of player 2 is: '+p2.tileId);
@@ -330,27 +358,46 @@ function avaGame(){
     window.addEventListener('keydown', function(e){movement(players[playerId],e)});
     
     function movement(obj,e){
-
+        let currentX = obj.x; //current position of player on X
+        console.log(currentX+ obj.name+' this into movements'); //TODO delete
+        let currentY = obj.y; //current position of player on Y
+        
         switch(e.keyCode){
             case 87://up arrow (W)
+            
+           if(dontMove == false){
             obj.moveUp();
             moveCounter +=1;
-            break;
+            break
+            }else{
+                obj.x = currX;
+            }
 
             case 83://down arrow (S)
-            obj.moveDown();
+            
+            if(dontMove == false){
+                obj.moveDown();
             moveCounter +=1;
             break;
+            }
 
             case 65://left arrow (A)
-            obj.moveLeft();
+            
+            if(dontMove == false){
+                obj.moveLeft();
             moveCounter +=1;
+            console.log('now'+obj.name+'is at '+obj.x);
             break;
+            }
 
             case 68://right arrow (D)
-            obj.moveRight();
+            
+            if(dontMove == false){
+                obj.moveRight();
             moveCounter +=1;
             break;
+            }
+            
 
             // Enter keyboard, this to switch immediatly to another player
             case 13:
@@ -385,6 +432,19 @@ function avaGame(){
             fight = false;
             console.log('fight false');
         }
+
+        // TODO The collision with other components
+
+        for(let i= 0; i < weapons.length;i++){
+            
+                if((obj.x + obj.w) > weapons[i].x
+                    && obj.x < (weapons[i].x + obj.w)
+                    && obj.y == weapons[i].y){
+                        console.log('current value of x now! ' +obj.x);
+                        obj.x = currentX; 
+                        obj.y = currentY;
+                    }
+            }
 
         // this could increment the movecounter to switch player
         if(moveCounter >= 3){
