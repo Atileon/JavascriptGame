@@ -49,14 +49,22 @@ class Component{
 
         //next 3 lines to set a random position for the players
         this.startId = this.startArea();// this simply to set an tile to deploy component followin the starArea method
-        this.x = Math.floor(this.startId % 10)*64;//value on X axis
-        this.y = Math.floor(this.startId / 10)*64;//value on Y axis
+        this.x = this.getX();
+        this.y = this.getY();
         
         this.w = width;
         this.h = height;
         this.color = color;
 
         this.tileId = this.getId();
+    }
+    getX(){
+        let coordX = Math.floor(this.startId % 10)*64;//value on X axis
+        return this.x = coordX
+    }
+    getY(){
+        let coordY = Math.floor(this.startId / 10)*64;//value on Y axis
+        return this.y = coordY
     }
     getId(){
         //this method could get us the Tile Id on Map to 
@@ -105,8 +113,18 @@ class Weapon extends Component {
     
 }
 class Obstacle extends Component{
-    constructor(area,width,height, color){
+    constructor(area,width,height, color,weaponArr){
         super(area,width,height,color);
+        this.weapons = weaponArr;
+    }
+    drawObst(){
+        for(let weapon of this.weapons){
+            if(this.startId == weapon.startId){
+                let newStart = this.startArea();
+                this.startId = newStart;
+                return this.startId;
+            }
+        }
     }
     
 }
@@ -278,6 +296,7 @@ function avaGame(){
 
     let weapons = [];//into this array (weapon[0]) is the basic weapon for the base player damage
     let players = [];
+    let obstacles = [];
 
     let images = [];
 
@@ -308,8 +327,22 @@ function avaGame(){
     let papaya = new Weapon('b',64,64,'orange','papaya',60);
     weapons.push(papaya);
 
-    Debugger.log('weapons had been created: ');
+    Debugger.log('weapons has been created: ');
     console.log(weapons);
+
+    let obst1 = new Obstacle('b',64,64,'gray',weapons);
+    obstacles.push(obst1);
+    let obst2 = new Obstacle('b',64,64,'gray',weapons);
+    obstacles.push(obst2);
+    let obst3 = new Obstacle('b',64,64,'gray',weapons);
+    obstacles.push(obst3);
+    let obst4 = new Obstacle('b',64,64,'gray',weapons);
+    obstacles.push(obst4);
+    let obst5 = new Obstacle('b',64,64,'gray',weapons);
+    obstacles.push(obst5);
+
+    Debugger.log('obstacles has been created: ');
+    console.log(obstacles);
 
     //As the weapons Objects we could push the players into an empty array
     // in this case the players[] array
@@ -369,8 +402,6 @@ function avaGame(){
             obj.moveUp();
             moveCounter +=1;
             break
-            }else{
-                obj.x = currX;
             }
 
             case 83://down arrow (S)
@@ -435,14 +466,16 @@ function avaGame(){
 
         // TODO The collision with other components
 
-        for(let i= 0; i < weapons.length;i++){
+        for(let i= 0; i < obstacles.length;i++){
             
-                if((obj.x + obj.w) > weapons[i].x
-                    && obj.x < (weapons[i].x + obj.w)
-                    && obj.y == weapons[i].y){
+                if((obj.x + obj.w) > obstacles[i].x
+                    && obj.x < (obstacles[i].x + obj.w)
+                    && obj.y == obstacles[i].y){
                         console.log('current value of x now! ' +obj.x);
                         obj.x = currentX; 
                         obj.y = currentY;
+                        moveCounter -=1;// this to decrease by 1 the moveCounter increased by keydown
+                        console.log (moveCounter);
                     }
             }
 
@@ -501,6 +534,11 @@ function avaGame(){
             weapons[1].drawIt(context);
             weapons[2].drawIt(context);
             weapons[3].drawIt(context);
+
+            for( let obst of obstacles){
+                obst.drawObst();
+                obst.drawIt();
+            }
         }
         function drawPlayers(){
 
