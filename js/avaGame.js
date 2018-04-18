@@ -314,13 +314,13 @@ function avaGame(){
     
 
     //Now we must create some weapons to push on the weapons[] empty array
-    let tomatoeOne = new Weapon('b',64,64,'blue','tomatoe',10);
+    let tomatoeOne = new Weapon('b',64,64,'green','tomatoe',10);
     weapons.push(tomatoeOne);
-    let tomatoeTwo = new Weapon('b',64,64,'brown','tomatoe',10);
+    let tomatoeTwo = new Weapon('b',64,64,'red','tomatoe',10);
     weapons.push(tomatoeTwo);
     let banana = new Weapon('b',64,64,'yellow','banana',50);
     weapons.push(banana);
-    let pera = new Weapon('b',64,64,'red','pera',60);
+    let pera = new Weapon('b',64,64,'brown','pera',60);
     weapons.push(pera);
     let papaya = new Weapon('b',64,64,'orange','papaya',60);
     weapons.push(papaya);
@@ -522,7 +522,15 @@ function avaGame(){
 
 
     function preventOverlay(arr){
-        
+        for(let i = 0; i==arr.length; i++){
+            if(arr[i].startId == arr[i +1].startId){
+                console.log('ouch!! collition on '+arr[i].name + arr[i].startId);
+                arr[i].startId = arr[i].startArea();
+                console.log('position changed on '+arr[i].name + arr[i].startId);
+                arr[i].x = arr[i].getX();
+                arr[i].y = arr[i].getY();
+            }
+        }
     }
 
     function drawGame(){
@@ -536,8 +544,8 @@ function avaGame(){
             //         weapon.drawIt();
             //     }
             // }
-            // weapons[0].drawIt(context);
-            // weapons[1].drawIt(context);
+            weapons[0].drawIt(context);
+            weapons[1].drawIt(context);
             weapons[2].drawIt(context);
             weapons[3].drawIt(context);
             weapons[4].drawIt(context);
