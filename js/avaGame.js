@@ -96,6 +96,19 @@ class Component{
         }
         return this.startId;
     }
+    drawObst(){
+        for(let weapon of this.weapons){
+            if(this.startId == weapon.startId){
+                console.log('the start obst is '+this.startId);
+                let newStart = this.startArea();
+                this.startId = newStart;
+                this.x = this.getX();
+                this.y = this.getY();
+                console.log('the start obst changed to'+this.startId)
+                return this.startId;
+            }
+        }
+    }
     drawIt(){
         let context = canvas.getContext('2d');
         context.fillStyle = this.color;
@@ -120,8 +133,12 @@ class Obstacle extends Component{
     drawObst(){
         for(let weapon of this.weapons){
             if(this.startId == weapon.startId){
+                console.log('the start obst is '+this.startId);
                 let newStart = this.startArea();
                 this.startId = newStart;
+                this.x = this.getX();
+                this.y = this.getY();
+                console.log('the start obst changed to'+this.startId)
                 return this.startId;
             }
         }
@@ -131,19 +148,15 @@ class Obstacle extends Component{
 
 class Player extends Component {
     
-    constructor(area,width,height,color,name,weapons){
+    constructor(area,width,height,color,name,weapons,weaponStart){
         super(area,width,height,color);
         this.enemy = this.nemesis;
         this.name = name;
         this.health = 100;
         this.weaponArr = weapons;
-        this.weapon = this.weaponArr[0];
+        this.weapon = this.weaponArr[weaponStart];
         this.damageP = this.weapon.damage;
         this.defense = false;
-
-        this.currentX = this.x;
-        console.log('current value of x ' +this.currentX);
-        this.currentY = this.y;
         // this.upgradeWeapon = this.weaponNew();s
     }
     get nemesis(){
@@ -179,11 +192,10 @@ class Player extends Component {
         // context.setTransform(1, 0, 0, 1, 0, 0);
     }
     getWeapon(){
-    //    requestAnimationFrame(this.getWeapon);
 
         for(let i=0; i < this.weaponArr.length; i++){
             if( this.getId() == this.weaponArr[i].getId()){
-                let droped = this.weapon;// current weapon stashed on variable
+                let droped = this.weapon;// current weapon to be droped
                 this.weapon = this.weaponArr[i]; //this take the new weapon
 
                 this.damageP = this.weaponArr[i].damage;
@@ -229,12 +241,6 @@ class Player extends Component {
         //         }
         // }
     }
-    stay(){
-        this.y += 0;
-        this.x += 0;
-        this.y -= 0;
-        this.x -= 0;
-    }
     moveUp(){
         this.y -= this.h;
     }
@@ -253,17 +259,6 @@ class Player extends Component {
 
 //========================THE GAME================================
 window.addEventListener("load", WindowLoaded, false);
-
-//this Debugger would post with a console log
-//relative message to the state of game
-var Debugger = function () { };
-Debugger.log = function (message) {
-   try {
-      console.log(message);
-   } catch (exception) {
-      return;
-   }
-}
 
 
 //Once the window is loaded this function would execute the game
@@ -298,6 +293,7 @@ function avaGame(){
     let players = [];
     let obstacles = [];
 
+    let allComponents;
     let images = [];
 
     let tileSheet = new Image();//Actually this is the tilesheet image for the map
@@ -318,8 +314,10 @@ function avaGame(){
     
 
     //Now we must create some weapons to push on the weapons[] empty array
-    let tomatoe = new Weapon('b',64,64,'brown','tomatoe',10);
-    weapons.push(tomatoe);
+    let tomatoeOne = new Weapon('b',64,64,'blue','tomatoe',10);
+    weapons.push(tomatoeOne);
+    let tomatoeTwo = new Weapon('b',64,64,'brown','tomatoe',10);
+    weapons.push(tomatoeTwo);
     let banana = new Weapon('b',64,64,'yellow','banana',50);
     weapons.push(banana);
     let pera = new Weapon('b',64,64,'red','pera',60);
@@ -327,7 +325,7 @@ function avaGame(){
     let papaya = new Weapon('b',64,64,'orange','papaya',60);
     weapons.push(papaya);
 
-    Debugger.log('weapons has been created: ');
+    console.log('weapons has been created: ');
     console.log(weapons);
 
     let obst1 = new Obstacle('b',64,64,'gray',weapons);
@@ -341,20 +339,22 @@ function avaGame(){
     let obst5 = new Obstacle('b',64,64,'gray',weapons);
     obstacles.push(obst5);
 
-    Debugger.log('obstacles has been created: ');
+    console.log('obstacles has been created: ');
     console.log(obstacles);
 
     //As the weapons Objects we could push the players into an empty array
     // in this case the players[] array
-    let carlitos = new Player('a',64,64,'black','carlitos',weapons);
+    let carlitos = new Player('a',64,64,'black','carlitos',weapons,3);
     players.push(carlitos);
-    let lucifera = new Player('c',64,64,'white','Lucifera',weapons);
+    let lucifera = new Player('c',64,64,'white','Lucifera',weapons,3);
     players.push(lucifera);
 
     carlitos.nemesis = lucifera;
     lucifera.nemesis = carlitos;
 
-    Debugger.log('players are on the arena: ');
+    allComponents = players.concat(weapons,obstacles);
+
+    console.log('players are on the arena: ');
     console.log(players);
 
     let p1 = carlitos;
@@ -366,16 +366,16 @@ function avaGame(){
     console.log('the id of player 1 is: '+p1.tileId);
     console.log('the id of player 2 is: '+p2.tileId);
 
-    console.log('the tile id of weapon  '+p1.weaponArr[1].tileId);
-
+    console.dir('the minkium maximum '+ allComponents[3].name);
 
     console.log('the id of '+ weapons[0].name+' is: '+weapons[0].tileId);
     console.log('the id of '+ weapons[1].name+' is: '+weapons[1].tileId);
     console.log('the id of '+ weapons[2].name+' is: '+weapons[2].tileId);
     console.log('the id of '+ weapons[3].name+' is: '+weapons[3].tileId);
+    console.log('the id of '+ weapons[4].name+' is: '+weapons[4].tileId);
     //===================================================================
 
-    Debugger.log('DrawingCanvas');
+    console.log('DrawingCanvas');
 
     //=================================================================
     function clearCanvas(){
@@ -392,7 +392,6 @@ function avaGame(){
     
     function movement(obj,e){
         let currentX = obj.x; //current position of player on X
-        console.log(currentX+ obj.name+' this into movements'); //TODO delete
         let currentY = obj.y; //current position of player on Y
         
         switch(e.keyCode){
@@ -521,19 +520,27 @@ function avaGame(){
 
     //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
 
+
+    function preventOverlay(arr){
+        
+    }
+
     function drawGame(){
 
         function drawComponents(){
 
+            preventOverlay(obstacles);
+            preventOverlay(weapons);
             // for(let weapon of weapons){// Thanks ES2015 :)
             //     if(!weapon[0]){
             //         weapon.drawIt();
             //     }
             // }
             // weapons[0].drawIt(context);
-            weapons[1].drawIt(context);
+            // weapons[1].drawIt(context);
             weapons[2].drawIt(context);
             weapons[3].drawIt(context);
+            weapons[4].drawIt(context);
 
             for( let obst of obstacles){
                 obst.drawObst();
