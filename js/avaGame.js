@@ -96,19 +96,6 @@ class Component{
         }
         return this.startId;
     }
-    drawObst(){
-        for(let weapon of this.weapons){
-            if(this.startId == weapon.startId){
-                console.log('the start obst is '+this.startId);
-                let newStart = this.startArea();
-                this.startId = newStart;
-                this.x = this.getX();
-                this.y = this.getY();
-                console.log('the start obst changed to'+this.startId)
-                return this.startId;
-            }
-        }
-    }
     drawIt(){
         let context = canvas.getContext('2d');
         context.fillStyle = this.color;
@@ -130,7 +117,7 @@ class Obstacle extends Component{
         super(area,width,height,color);
         this.weapons = weaponArr;
     }
-    drawObst(){
+    startObst(){
         for(let weapon of this.weapons){
             if(this.startId == weapon.startId){
                 console.log('the start obst is '+this.startId);
@@ -314,16 +301,18 @@ function avaGame(){
     
 
     //Now we must create some weapons to push on the weapons[] empty array
-    let tomatoeOne = new Weapon('b',64,64,'green','tomatoe',10);
+    let tomatoeOne = new Weapon('b',64,64,'pink','tomatoe',10);
     weapons.push(tomatoeOne);
     let tomatoeTwo = new Weapon('b',64,64,'red','tomatoe',10);
     weapons.push(tomatoeTwo);
     let banana = new Weapon('b',64,64,'yellow','banana',50);
     weapons.push(banana);
-    let pera = new Weapon('b',64,64,'brown','pera',60);
-    weapons.push(pera);
+    let coco = new Weapon('b',64,64,'brown','coco',60);
+    weapons.push(coco);
     let papaya = new Weapon('b',64,64,'orange','papaya',60);
     weapons.push(papaya);
+    let lemon = new Weapon('b',64,64,'green','orange',60);
+    weapons.push(lemon);
 
     console.log('weapons has been created: ');
     console.log(weapons);
@@ -344,9 +333,9 @@ function avaGame(){
 
     //As the weapons Objects we could push the players into an empty array
     // in this case the players[] array
-    let carlitos = new Player('a',64,64,'black','carlitos',weapons,3);
+    let carlitos = new Player('a',64,64,'black','carlitos',weapons,0);
     players.push(carlitos);
-    let lucifera = new Player('c',64,64,'white','Lucifera',weapons,3);
+    let lucifera = new Player('c',64,64,'white','Lucifera',weapons,1);
     players.push(lucifera);
 
     carlitos.nemesis = lucifera;
@@ -366,7 +355,6 @@ function avaGame(){
     console.log('the id of player 1 is: '+p1.tileId);
     console.log('the id of player 2 is: '+p2.tileId);
 
-    console.dir('the minkium maximum '+ allComponents[3].name);
 
     console.log('the id of '+ weapons[0].name+' is: '+weapons[0].tileId);
     console.log('the id of '+ weapons[1].name+' is: '+weapons[1].tileId);
@@ -470,7 +458,7 @@ function avaGame(){
                 if((obj.x + obj.w) > obstacles[i].x
                     && obj.x < (obstacles[i].x + obj.w)
                     && obj.y == obstacles[i].y){
-                        console.log('current value of x now! ' +obj.x);
+                        // console.log('current value of x now! ' +obj.x);
                         obj.x = currentX; 
                         obj.y = currentY;
                         moveCounter -=1;// this to decrease by 1 the moveCounter increased by keydown
@@ -522,13 +510,16 @@ function avaGame(){
 
 
     function preventOverlay(arr){
-        for(let i = 0; i==arr.length; i++){
+        for(let i = 0; i<arr.length; i++){
             if(arr[i].startId == arr[i +1].startId){
                 console.log('ouch!! collition on '+arr[i].name + arr[i].startId);
                 arr[i].startId = arr[i].startArea();
                 console.log('position changed on '+arr[i].name + arr[i].startId);
                 arr[i].x = arr[i].getX();
                 arr[i].y = arr[i].getY();
+                arr[i].drawIt();
+            }else if(arr[i].startId == arr[i].startId){
+                arr[i].drawIt();
             }
         }
     }
@@ -537,21 +528,18 @@ function avaGame(){
 
         function drawComponents(){
 
-            preventOverlay(obstacles);
-            preventOverlay(weapons);
             // for(let weapon of weapons){// Thanks ES2015 :)
             //     if(!weapon[0]){
             //         weapon.drawIt();
             //     }
             // }
-            weapons[0].drawIt(context);
-            weapons[1].drawIt(context);
             weapons[2].drawIt(context);
             weapons[3].drawIt(context);
             weapons[4].drawIt(context);
+            weapons[5].drawIt(context);
 
             for( let obst of obstacles){
-                obst.drawObst();
+                obst.startObst();
                 obst.drawIt();
             }
         }
