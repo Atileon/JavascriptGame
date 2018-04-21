@@ -37,7 +37,7 @@ class Map {
                 let srcY = Math.floor(tileId / 10) * 64;
                 this.context.drawImage(tileSheet, srcX, srcY, 64,64, colId*64, rowId*64,64,64);
 
-            }                
+            }
         }
     }
 }
@@ -117,6 +117,7 @@ class Obstacle extends Component{
         super(area,width,height,color);
         this.weapons = weaponArr;
     }
+
     startObst(){
         for(let weapon of this.weapons){
             if(this.startId == weapon.startId){
@@ -135,13 +136,13 @@ class Obstacle extends Component{
 
 class Player extends Component {
     
-    constructor(area,width,height,color,name,weapons,weaponStart){
+    constructor(area,width,height,color,name,weapons){
         super(area,width,height,color);
         this.enemy = this.nemesis;
         this.name = name;
         this.health = 100;
         this.weaponArr = weapons;
-        this.weapon = this.weaponArr[weaponStart];
+        this.weapon = this.weaponArr[0];
         this.damageP = this.weapon.damage;
         this.defense = false;
         // this.upgradeWeapon = this.weaponNew();s
@@ -157,6 +158,12 @@ class Player extends Component {
         console.log(this.health);
     }
     attack(){
+
+        let container = document.getElementById('log-container');
+        let pElement = document.createElement('p');
+
+        container.innerHTML = '';
+        
         
         this.enemy.hit = this.damageP;        
         if(this.enemy.defense){
@@ -166,7 +173,10 @@ class Player extends Component {
         this.enemy.health -= this.enemy.hit;
         console.log('hit on: '+this.enemy.name+ ' is '+this.enemy.hit);
         console.log('enemy health: '+this.enemy.health);
-        
+
+        pElement.id = `${this.name}-attack`;
+        pElement.textContent = `> ${this.name} has attacked ${this.enemy.name} !! Now ${this.enemy.name}'s health is ${this.enemy.health} __`;
+        container.appendChild(pElement);
     }
     shield(){
         this.defense = true;
@@ -178,6 +188,8 @@ class Player extends Component {
         context.drawImage(img, this.x, this.y, this.w, this.h);
         // context.setTransform(1, 0, 0, 1, 0, 0);
     }
+
+    // FOR PRESENTATION
     getWeapon(){
 
         for(let i=0; i < this.weaponArr.length; i++){
@@ -240,7 +252,18 @@ class Player extends Component {
     moveRight(){
         this.x += this.w;
     }
-    
+    htmlPrint(){
+        let container = document.getElementById('log-container');
+        let pEl = document.createElement('p');
+        pEl.id = `${this.name}-element`;
+        // pEl.textContent = `the health of ${this.enemy.name} is ${this.enemy.health}`;
+        container.appendChild(pEl);
+
+    }
+    htmlRemove(){
+        let container = document.getElementById('log-container');
+        container.innerHTML ='';
+    }
 }
 
 
@@ -305,13 +328,13 @@ function avaGame(){
     weapons.push(tomatoeOne);
     let tomatoeTwo = new Weapon('b',64,64,'red','tomatoe',10);
     weapons.push(tomatoeTwo);
-    let banana = new Weapon('b',64,64,'yellow','banana',50);
+    let banana = new Weapon('b',64,64,'yellow','banana',30);
     weapons.push(banana);
-    let coco = new Weapon('b',64,64,'brown','coco',60);
+    let coco = new Weapon('b',64,64,'brown','coco',30);
     weapons.push(coco);
-    let papaya = new Weapon('b',64,64,'orange','papaya',60);
+    let papaya = new Weapon('b',64,64,'orange','papaya',50);
     weapons.push(papaya);
-    let lemon = new Weapon('b',64,64,'green','orange',60);
+    let lemon = new Weapon('b',64,64,'green','lemon',50);
     weapons.push(lemon);
 
     console.log('weapons has been created: ');
@@ -333,21 +356,21 @@ function avaGame(){
 
     //As the weapons Objects we could push the players into an empty array
     // in this case the players[] array
-    let carlitos = new Player('a',64,64,'black','carlitos',weapons,0);
-    players.push(carlitos);
-    let lucifera = new Player('c',64,64,'white','Lucifera',weapons,1);
-    players.push(lucifera);
+    let kevin = new Player('a',64,64,'black','kevin',weapons);
+    players.push(kevin);
+    let stuart = new Player('c',64,64,'white','stuart',weapons);
+    players.push(stuart);
 
-    carlitos.nemesis = lucifera;
-    lucifera.nemesis = carlitos;
+    kevin.nemesis = stuart;
+    stuart.nemesis = kevin;
 
     allComponents = players.concat(weapons,obstacles);
 
     console.log('players are on the arena: ');
     console.log(players);
 
-    let p1 = carlitos;
-    let p2 = lucifera;
+    let p1 = kevin;
+    let p2 = stuart;
 
     let fight = false;
     let dontMove = false;
@@ -365,13 +388,14 @@ function avaGame(){
 
     console.log('DrawingCanvas');
 
-    //=================================================================
+    //======================= Clear Canvas Fn =========================
     function clearCanvas(){
         context.clearRect(0,0,canvas.width,canvas.height);
-        // Debugger.log('clearing Canvas');
     }
 
     //======================TURN MECHANISM=============================
+
+    // Global Variables
     let moveCounter = 0;
     let playerId = 0;
     let turnChange = false;
@@ -384,30 +408,21 @@ function avaGame(){
         
         switch(e.keyCode){
             case 87://up arrow (W)
-            
-           if(dontMove == false){
             obj.moveUp();
             moveCounter +=1;
             break
-            }
-
+           
             case 83://down arrow (S)
-            
-            if(dontMove == false){
-                obj.moveDown();
+            obj.moveDown();
             moveCounter +=1;
             break;
-            }
-
-            case 65://left arrow (A)
             
-            if(dontMove == false){
-                obj.moveLeft();
+            case 65://left arrow (A)
+            obj.moveLeft();
             moveCounter +=1;
             console.log('now'+obj.name+'is at '+obj.x);
             break;
-            }
-
+            
             case 68://right arrow (D)
             
             if(dontMove == false){
@@ -429,6 +444,7 @@ function avaGame(){
             case 78:// Key (N) to attack
             if(fight){
                 obj.attack();
+
             moveCounter +=3;
             break;
             }
@@ -440,18 +456,23 @@ function avaGame(){
             break;
             }
             
-           
         }
-        // ==== the tile collision for players fight event
+
+        
+        
+        // ==== The tile collision for players fight event
         if(p1.getId() == p2.getId()){
             fight = true;
             console.log('fight!!!!');
+           
+            
         }else{
             fight = false;
+            
             console.log('fight false');
         }
 
-        // TODO The collision with other components
+        // The collision with other components
 
         for(let i= 0; i < obstacles.length;i++){
             
@@ -505,29 +526,40 @@ function avaGame(){
     //     }
         
     // }
-
-    //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
-
-
-    function preventOverlay(arr){
-        for(let i = 0; i<arr.length; i++){
-            if(arr[i].startId == arr[i +1].startId){
-                console.log('ouch!! collition on '+arr[i].name + arr[i].startId);
-                arr[i].startId = arr[i].startArea();
-                console.log('position changed on '+arr[i].name + arr[i].startId);
-                arr[i].x = arr[i].getX();
-                arr[i].y = arr[i].getY();
-                arr[i].drawIt();
-            }else if(arr[i].startId == arr[i].startId){
-                arr[i].drawIt();
+    function takeWeapon(){
+        for(let player of players){
+            for(let weapon of weapons){
+                if(player.tileId == weapon.startId){
+                    player.getWeapon();
+                    console.log('event weapon occurs');
+                    break;
+                }
             }
         }
     }
 
+    //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
+
+
+    // function preventOverlay(arr){
+    //     for(let i = 1; i<=arr.length; i++){
+    //         if(arr[i-1].startId == arr[i].startId){
+    //             console.log('ouch!! collition on '+arr[i].name + arr[i].startId);
+    //             arr[i].startId = arr[i].startArea();
+    //             console.log('position changed on '+arr[i].name + arr[i].startId);
+    //             arr[i].x = arr[i].getX();
+    //             arr[i].y = arr[i].getY();
+    //             arr[i].drawIt();
+    //         }else if(arr[i].startId == arr[i].startId){
+    //             arr[i].drawIt();
+    //         }
+    //     }
+    // }
+
     function drawGame(){
+        
 
         function drawComponents(){
-
             // for(let weapon of weapons){// Thanks ES2015 :)
             //     if(!weapon[0]){
             //         weapon.drawIt();
@@ -547,17 +579,21 @@ function avaGame(){
 
             for(let player of players){
                 player.newPos();
+                
             }
             // p1.newPos();
             // p2.newPos();
             p1.drawP(imgp1);
+           
             p2.drawP(imgp2);
 
         }
-        
+
         gameArea.drawMap(tileSheet);
         drawComponents();
         drawPlayers();
+        
+        // takeWeapon();
     }
 
     //=============The Game Over===============
@@ -565,21 +601,27 @@ function avaGame(){
     // after the alert the browser will refresh begining a new battle
     function gameOver(){
         if(p1.health <= 0 || p2.health <= 0){
-            alert('GAME OVER');
-            location.reload();
+            alert('GAME OVER');// Alert message for the Game Over
+
+            //This for loop set the health of players to 1 to get the alert False
+            for(let player of players){
+                player.health = 1;
+            }
+            //after the for loop we Restart the game when the Alert has been closed
+            location.reload(true);
         }
     }
 
     //===========THE GAME LOOP============================
-    let myRaf;
+   
     function updateGame(){
-        myRaf = requestAnimationFrame(updateGame);
+        requestAnimationFrame(updateGame);
         gameOver(); 
         clearCanvas();//this clear the canvas
         
         drawGame();//this draw the canvas again with positions updated
     }
 
-    myRaf = requestAnimationFrame(updateGame);
+    updateGame();
 
 }//end of game app
