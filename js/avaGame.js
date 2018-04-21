@@ -252,18 +252,7 @@ class Player extends Component {
     moveRight(){
         this.x += this.w;
     }
-    htmlPrint(){
-        let container = document.getElementById('log-container');
-        let pEl = document.createElement('p');
-        pEl.id = `${this.name}-element`;
-        // pEl.textContent = `the health of ${this.enemy.name} is ${this.enemy.health}`;
-        container.appendChild(pEl);
-
-    }
-    htmlRemove(){
-        let container = document.getElementById('log-container');
-        container.innerHTML ='';
-    }
+    
 }
 
 
