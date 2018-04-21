@@ -121,12 +121,13 @@ class Obstacle extends Component{
     startObst(){
         for(let weapon of this.weapons){
             if(this.startId == weapon.startId){
+                console.log('====Start Collision====');
                 console.log('the start obst is '+this.startId);
                 let newStart = this.startArea();
                 this.startId = newStart;
                 this.x = this.getX();
                 this.y = this.getY();
-                console.log('the start obst changed to'+this.startId)
+                console.log('the start obst changed to '+this.startId)
                 return this.startId;
             }
         }
@@ -175,7 +176,10 @@ class Player extends Component {
         console.log('enemy health: '+this.enemy.health);
 
         pElement.id = `${this.name}-attack`;
-        pElement.textContent = `> ${this.name} has attacked ${this.enemy.name} !! Now ${this.enemy.name}'s health is ${this.enemy.health} __`;
+        pElement.textContent = `
+        > ${this.name.toUpperCase()} has attacked ${this.enemy.name.toUpperCase()} !! 
+        Now ${this.enemy.name.toUpperCase()}'s health is ${this.enemy.health} __
+        `;
         container.appendChild(pElement);
     }
     shield(){
@@ -204,7 +208,7 @@ class Player extends Component {
                 this.weaponArr[i].y = this.y;
 
                 this.weaponArr[i].drawIt();
-                console.log(this.weaponArr[i]);
+                console.log(this.weaponArr[i].name);
                 
             }else{    
                 this.weapon;
@@ -313,10 +317,10 @@ function avaGame(){
     
 
     //Now we must create some weapons to push on the weapons[] empty array
-    let tomatoeOne = new Weapon('b',64,64,'pink','tomatoe',10);
-    weapons.push(tomatoeOne);
-    let tomatoeTwo = new Weapon('b',64,64,'red','tomatoe',10);
-    weapons.push(tomatoeTwo);
+    let tomatoe = new Weapon('b',64,64,'red','tomatoe',10);
+    weapons.push(tomatoe);
+    let apple = new Weapon('b',64,64,'pink','apple',20);
+    weapons.push(apple);
     let banana = new Weapon('b',64,64,'yellow','banana',30);
     weapons.push(banana);
     let coco = new Weapon('b',64,64,'brown','coco',30);
@@ -350,6 +354,7 @@ function avaGame(){
     let stuart = new Player('c',64,64,'white','stuart',weapons);
     players.push(stuart);
 
+    //The following to set the enemy for any player
     kevin.nemesis = stuart;
     stuart.nemesis = kevin;
 
@@ -373,6 +378,7 @@ function avaGame(){
     console.log('the id of '+ weapons[2].name+' is: '+weapons[2].tileId);
     console.log('the id of '+ weapons[3].name+' is: '+weapons[3].tileId);
     console.log('the id of '+ weapons[4].name+' is: '+weapons[4].tileId);
+    console.log('the id of '+ weapons[5].name+' is: '+weapons[5].tileId);
     //===================================================================
 
     console.log('DrawingCanvas');
@@ -486,7 +492,7 @@ function avaGame(){
                  playerId = 0;
             }
 
-            alert('Player '+(players[playerId].name)+ ' Turn!!');
+            alert('Player '+(players[playerId].name.toUpperCase())+ ' Turn!!');
             console.log('the player on Array is: '+playerId);
             console.log(players);
 
@@ -515,10 +521,13 @@ function avaGame(){
     //     }
         
     // }
+    
+    //============ TESTING THE TAKE WEAPON ON COLLISION =============
+
     function takeWeapon(){
         for(let player of players){
             for(let weapon of weapons){
-                if(player.tileId == weapon.startId){
+                if(player.tileId == weapon.tileId){
                     player.getWeapon();
                     console.log('event weapon occurs');
                     break;
@@ -526,68 +535,64 @@ function avaGame(){
             }
         }
     }
-
+    
     //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
 
-
-    // function preventOverlay(arr){
-    //     for(let i = 1; i<=arr.length; i++){
-    //         if(arr[i-1].startId == arr[i].startId){
-    //             console.log('ouch!! collition on '+arr[i].name + arr[i].startId);
-    //             arr[i].startId = arr[i].startArea();
-    //             console.log('position changed on '+arr[i].name + arr[i].startId);
-    //             arr[i].x = arr[i].getX();
-    //             arr[i].y = arr[i].getY();
-    //             arr[i].drawIt();
-    //         }else if(arr[i].startId == arr[i].startId){
-    //             arr[i].drawIt();
-    //         }
-    //     }
-    // }
-
     function drawGame(){
-        
-
+        // Let's Draw the Game!!
+        // takeWeapon();
+        //====================================================
+        //This Fn will draw the weapons and obstacles objects
         function drawComponents(){
+            //== In case of WAR Break this comments to get all WEAPONS lol==
             // for(let weapon of weapons){// Thanks ES2015 :)
             //     if(!weapon[0]){
             //         weapon.drawIt();
             //     }
             // }
-            weapons[2].drawIt(context);
-            weapons[3].drawIt(context);
-            weapons[4].drawIt(context);
-            weapons[5].drawIt(context);
 
+            //This for loop because we dont want the first (basic) weapon on board
+            for(let i = 2; i<weapons.length; i++){
+                weapons[i].drawIt();
+            }
+            
+            //Let's draw the obstacles!!
             for( let obst of obstacles){
+                //This will first detect collision with weapons objects
+                //Look into the Player method class
                 obst.startObst();
+                //Then Obstacles will be draw on board
                 obst.drawIt();
             }
         }
+
+        //================================================
+        //This Fn draw both players
         function drawPlayers(){
 
             for(let player of players){
+                //This to update position of both players
                 player.newPos();
-                
             }
-            // p1.newPos();
-            // p2.newPos();
+            //Draw Player 1 passing the image variable on drawP() method
             p1.drawP(imgp1);
-           
+           //Draw Player 2 passing the image variable on drawP() method
             p2.drawP(imgp2);
-
         }
+        //================================
+        //Thus just call the previous functions to draw Game
 
+        //This draw the map with the tile sheet passed on method as a variable
         gameArea.drawMap(tileSheet);
         drawComponents();
         drawPlayers();
-        
-        // takeWeapon();
+
     }
 
     //=============The Game Over===============
-    //this just check for players health to get the Game over
-    // after the alert the browser will refresh begining a new battle
+    //This just check for players health to get the Game over alert.
+    //After the alert the browser will refresh begining a new battle. TADAAA!
+    //Another War for the Minions... papaya!
     function gameOver(){
         if(p1.health <= 0 || p2.health <= 0){
             alert('GAME OVER');// Alert message for the Game Over
@@ -603,9 +608,12 @@ function avaGame(){
 
     //===========THE GAME LOOP============================
    
+    // This Fn just to update the canvas and the game itself with RAF
     function updateGame(){
         requestAnimationFrame(updateGame);
+
         gameOver(); 
+
         clearCanvas();//this clear the canvas
         
         drawGame();//this draw the canvas again with positions updated
