@@ -3,40 +3,52 @@
 //Into the game there must be:
 //    -A class Map to generate a map from an array
 //    -A class Component to generalize position an dimensions for any element
-//    -An extended from Component class for players 
-//    -An extended from Component class for weapons
+//    -An extended from Component class for Players 
+//    -An extended from Component class for Weapons
+//    -An extended from Component class for Obstacles
 //
 // After creation of this classes I must to create some functions to:
 //    -Initialize the game
 //    -create the map on canvas
 //    -create the player Obj
 //    -create weapons on map
-//    -update all functions with current values
+//    -update all functions with current/updated values
 'use strict';
 //=========================CLASSES==============================
 class Map {
     constructor(cols,rows,tileW,tileH,arr,ctx){
-        this.cols = cols;
-        this.rows = rows;
-        this.tileW = tileW;
-        this.tileH = tileH;
+        this.cols = cols;//columns of map
+        this.rows = rows;//rows of map
+        this.tileW = tileW;// dimension of tiles on X
+        this.tileH = tileH;// dimension of tiles on Y
         this.mapArr = arr; //this is for the map array which would be a bidimensional array 'arr[][]'
         this.context = ctx;//canvas context passed into a variable
-        this.mapIO = -1; //this is the index offset for the map array
+        this.mapIdxOffset = -1; //this is the index offset for the map array 
     }
     drawMap(tileSheet){
         // This method will draw the map 
         // and there's need just of a tilesheet image declared into a variable
         // to pass into this method
+        //===================================
+        //The following for loops get coords of the tilesheet to be drawn on the relative position on board
 
+        //So, this for pass through the rows of the tilesheet 
         for(let rowId = 0; rowId<this.rows; rowId++){
+            //And this for trhough the cols of tilesheet
             for(let colId = 0; colId<this.cols; colId++){
-                // let tileId = Math.floor(Math.random()*100 + gameArea.mapIO); // lol
-                let tileId = this.mapArr[rowId][colId] + this.mapIO;
-                let srcX = Math.floor(tileId % 10) * 64;
-                let srcY = Math.floor(tileId / 10) * 64;
+                // the tileId is the number of cell at the Tilesheet which are represented starting at 
+                // number 1 just for a visual refer to the tilesheet itself. 
+                //Thus with the following variable we get the tile Id (see ref. at README.md) to be drawn
+                // and substract with the index offset(mapIdxOffset) for the real value on the array
+                let tileId = this.mapArr[rowId][colId] + this.mapIdxOffset;
+                //For a better explanation about the following 2 variables go to:
+                // https://youtu.be/69dHLDT0Eco?t=12m35s
+                let srcX = Math.floor(tileId % 10) * 64;//The srcX give us the Source coordinate on X on the tilesheet
+                let srcY = Math.floor(tileId / 10) * 64;//The srcY give us the Source coordinate on Y on the tilesheet
+                //To draw the image we got to use the drawImage for canvas context
+                //Refers on Mozilla developer Network: 
+                // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
                 this.context.drawImage(tileSheet, srcX, srcY, 64,64, colId*64, rowId*64,64,64);
-
             }
         }
     }
@@ -49,16 +61,19 @@ class Component{
 
         //next 3 lines to set a random position for the players
         this.startId = this.startArea();// this simply to set an tile to deploy component followin the starArea method
-        this.x = this.getX();
-        this.y = this.getY();
+        this.x = this.getX();// Once the startId is calculated this gets the relative coord on X
+        this.y = this.getY();// Once the startId is calculated this gets the relative coord on Y
         
-        this.w = width;
-        this.h = height;
-        this.color = color;
-
+        this.w = width;// width of component 
+        this.h = height;// height of component
+        this.color = color; // a fallback color because of future improvements any component will be drawn with image
+        // The tileId give us the "visual" Id on map and allow us to use it to compare positions with any other
+        // component on game
         this.tileId = this.getId();
+
     }
     getX(){
+        //This method just to obtain the X coordinate
         let coordX = Math.floor(this.startId % 10)*64;//value on X axis
         return this.x = coordX
     }
@@ -68,14 +83,14 @@ class Component{
     }
     getId(){
         //this method could get us the Tile Id on Map to 
-        //compare with any other element to get or to fight
+        //compare with any other element to get || fight || detect collition
         this.tileX = Math.floor(this.x/this.w);
         this.tileY = Math.floor(this.y/this.h);
         this.tileId = Math.floor(this.tileY * 10)+ this.tileX;
         return this.tileId;
     }
     startArea(){
-        // this method give the element an area to start on map
+        // this method give the component an area to start on map
         // the Top Area is 'a'
         // the Middle Area is 'b'
         // and the Bottom Area is 'c'
@@ -97,6 +112,7 @@ class Component{
         return this.startId;
     }
     drawIt(){
+        // This simply draw the Component on canvas
         let context = canvas.getContext('2d');
         context.fillStyle = this.color;
         context.fillRect(this.x, this.y, this.w, this.h);
@@ -107,28 +123,35 @@ class Component{
 class Weapon extends Component {
     constructor(area,width,height,color,name, damage){
         super(area,width,height,color);
-        this.name = name;
-        this.damage = damage;
+        this.name = name;// the name of Weapon
+        this.damage = damage;// the damage of Weapon
     }
     
 }
 class Obstacle extends Component{
     constructor(area,width,height, color,weaponArr){
         super(area,width,height,color);
+        //The Obstacle Object takes the Weapons array to prevent overlay with Weapons objects
         this.weapons = weaponArr;
     }
 
     startObst(){
+        //This method let us draw the obstacle on map preventing the overlay with weapons
         for(let weapon of this.weapons){
+            //So if the start Id of weapons and obstacles are equals...
             if(this.startId == weapon.startId){
-                console.log('====Start Collision====');
-                console.log('the start obst is '+this.startId);
+                console.log('==Obstacle at Start Collision==');
+                console.log(`Obstacle started at id ${this.tileId}`);
+                // ... the statement recalculate for a new start Id when game starts
                 let newStart = this.startArea();
+                // ... so, new start are passed at constructor for a new start Id 
                 this.startId = newStart;
+                // ... then we can get new coordinates with the new startId 
+                // using the respective methods for X and Y values
                 this.x = this.getX();
                 this.y = this.getY();
-                console.log('the start obst changed to '+this.startId)
-                return this.startId;
+                
+                console.log(`So, Obstacle moves on id ${this.startId}`)
             }
         }
     }
@@ -137,16 +160,15 @@ class Obstacle extends Component{
 
 class Player extends Component {
     
-    constructor(area,width,height,color,name,weapons){
+    constructor(area,width,height,color,name,weaponsArr,startWeapon){
         super(area,width,height,color);
-        this.enemy = this.nemesis;
+        this.enemy = this.nemesis; //this to set the another player array
         this.name = name;
         this.health = 100;
-        this.weaponArr = weapons;
-        this.weapon = this.weaponArr[0];
+        this.weaponArr = weaponsArr;
+        this.weapon = this.weaponArr[startWeapon];
         this.damageP = this.weapon.damage;
-        this.defense = false;
-        // this.upgradeWeapon = this.weaponNew();s
+        this.defense = false;// This is the shield of player, if activated this turns True;
     }
     get nemesis(){
        return this.enemy;
@@ -195,8 +217,9 @@ class Player extends Component {
 
     // FOR PRESENTATION
     getWeapon(){
+        
 
-        for(let i=0; i < this.weaponArr.length; i++){
+        for(let i=2; i < this.weaponArr.length; i++){
             if( this.getId() == this.weaponArr[i].getId()){
                 let droped = this.weapon;// current weapon to be droped
                 this.weapon = this.weaponArr[i]; //this take the new weapon
@@ -263,13 +286,11 @@ class Player extends Component {
 //========================THE GAME================================
 window.addEventListener("load", WindowLoaded, false);
 
-
 //Once the window is loaded this function would execute the game
 function WindowLoaded (){
     avaGame();
-
 }
-
+// Here starts the game app
 function avaGame(){    
     //This is the main function and here would be the global variables
     let canvas = document.getElementById('canvas');
@@ -277,14 +298,14 @@ function avaGame(){
 
     let map = [
         [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
-        [21,21,21,21,21,21,21,21,21,21],
+        [18,18,18,18,18,18,18,18,18,18],
+        [11,11,11,11,11,11,11,11,11,11],
+        [11,11,11,11,11,11,11,11,11,11],
+        [11,11,11,11,11,11,11,11,11,11],
+        [11,11,11,11,11,11,11,11,11,11],
+        [11,11,11,11,11,11,11,11,11,11],
+        [11,11,11,11,11,11,11,11,11,11],
+        [19,19,19,19,19,19,19,19,19,19],
         [21,21,21,21,21,21,21,21,21,21],
     ];
 
@@ -292,11 +313,10 @@ function avaGame(){
     // lets crete the game area
     let gameArea = new Map(10,10,64,64,map,context);
 
-    let weapons = [];//into this array (weapon[0]) is the basic weapon for the base player damage
-    let players = [];
-    let obstacles = [];
+    let weapons = [];//into this array the first two weapons are the basic weapon for the base player damage
+    let players = [];// here would be pushed the players
+    let obstacles = [];//here would be pushed the obstacles
 
-    let allComponents;
     let images = [];
 
     let tileSheet = new Image();//Actually this is the tilesheet image for the map
@@ -315,24 +335,30 @@ function avaGame(){
         console.log('image loaded');
     }
     
-
+    // CREATE WEAPONS: constructor(area,width,height,color,name, damage)
     //Now we must create some weapons to push on the weapons[] empty array
+    // The first Two weapons would be basic weapons and would be passed at
+    // Players constructor as the last argument
     let tomatoe = new Weapon('b',64,64,'red','tomatoe',10);
     weapons.push(tomatoe);
-    let apple = new Weapon('b',64,64,'pink','apple',20);
+    let apple = new Weapon('b',64,64,'green','apple',10);
     weapons.push(apple);
+    //================================================================
+    //The following weapons are the upgraded weapons to be drawn on board
     let banana = new Weapon('b',64,64,'yellow','banana',30);
     weapons.push(banana);
     let coco = new Weapon('b',64,64,'brown','coco',30);
     weapons.push(coco);
     let papaya = new Weapon('b',64,64,'orange','papaya',50);
     weapons.push(papaya);
-    let lemon = new Weapon('b',64,64,'green','lemon',50);
+    let lemon = new Weapon('b',64,64,'greenyellow','lemon',50);
     weapons.push(lemon);
 
     console.log('weapons has been created: ');
     console.log(weapons);
 
+    // CREATE OBSTACLES: constructor(area,width,height, color,weaponArr)
+    // These would be pushed into another array for obstacles
     let obst1 = new Obstacle('b',64,64,'gray',weapons);
     obstacles.push(obst1);
     let obst2 = new Obstacle('b',64,64,'gray',weapons);
@@ -347,18 +373,18 @@ function avaGame(){
     console.log('obstacles has been created: ');
     console.log(obstacles);
 
+    // CREATE PLAYERS : constructor (area,width,height,color,name,weaponsArr,startWeapon)
     //As the weapons Objects we could push the players into an empty array
     // in this case the players[] array
-    let kevin = new Player('a',64,64,'black','kevin',weapons);
+    let kevin = new Player('a',64,64,'black','kevin',weapons,0);
     players.push(kevin);
-    let stuart = new Player('c',64,64,'white','stuart',weapons);
+    let stuart = new Player('c',64,64,'white','stuart',weapons,1);
     players.push(stuart);
 
     //The following to set the enemy for any player
     kevin.nemesis = stuart;
     stuart.nemesis = kevin;
 
-    allComponents = players.concat(weapons,obstacles);
 
     console.log('players are on the arena: ');
     console.log(players);
@@ -373,20 +399,12 @@ function avaGame(){
     console.log('the id of player 2 is: '+p2.tileId);
 
 
-    console.log('the id of '+ weapons[0].name+' is: '+weapons[0].tileId);
-    console.log('the id of '+ weapons[1].name+' is: '+weapons[1].tileId);
-    console.log('the id of '+ weapons[2].name+' is: '+weapons[2].tileId);
-    console.log('the id of '+ weapons[3].name+' is: '+weapons[3].tileId);
-    console.log('the id of '+ weapons[4].name+' is: '+weapons[4].tileId);
-    console.log('the id of '+ weapons[5].name+' is: '+weapons[5].tileId);
-    //===================================================================
-
-    console.log('DrawingCanvas');
-
-    //======================= Clear Canvas Fn =========================
-    function clearCanvas(){
-        context.clearRect(0,0,canvas.width,canvas.height);
-    }
+    // console.log(`Start Id of ${weapons[0].name} is ${weapons[0].tileId}`);
+    // console.log(`Start Id of ${weapons[1].name} is ${weapons[1].tileId}`);
+    console.log(`Start Id of ${weapons[2].name}(${weapons[2].color}) is ${weapons[2].tileId}`);
+    console.log(`Start Id of ${weapons[3].name}(${weapons[3].color}) is ${weapons[3].tileId}`);
+    console.log(`Start Id of ${weapons[4].name}(${weapons[4].color}) is ${weapons[4].tileId}`);
+    console.log(`Start Id of ${weapons[5].name}(${weapons[5].color}) is ${weapons[5].tileId}`);
 
     //======================TURN MECHANISM=============================
 
@@ -522,21 +540,13 @@ function avaGame(){
         
     // }
     
-    //============ TESTING THE TAKE WEAPON ON COLLISION =============
 
-    function takeWeapon(){
-        for(let player of players){
-            for(let weapon of weapons){
-                if(player.tileId == weapon.tileId){
-                    player.getWeapon();
-                    console.log('event weapon occurs');
-                    break;
-                }
-            }
-        }
-    }
-    
     //=======THE GAME AND COMPONENTS READY TO BE DRAWED=============
+
+    //======================= Clear Canvas Fn =========================
+    function clearCanvas(){
+        context.clearRect(0,0,canvas.width,canvas.height);
+    }
 
     function drawGame(){
         // Let's Draw the Game!!
@@ -546,9 +556,7 @@ function avaGame(){
         function drawComponents(){
             //== In case of WAR Break this comments to get all WEAPONS lol==
             // for(let weapon of weapons){// Thanks ES2015 :)
-            //     if(!weapon[0]){
             //         weapon.drawIt();
-            //     }
             // }
 
             //This for loop because we dont want the first (basic) weapon on board
@@ -594,15 +602,26 @@ function avaGame(){
     //After the alert the browser will refresh begining a new battle. TADAAA!
     //Another War for the Minions... papaya!
     function gameOver(){
-        if(p1.health <= 0 || p2.health <= 0){
-            alert('GAME OVER');// Alert message for the Game Over
-
-            //This for loop set the health of players to 1 to get the alert False
-            for(let player of players){
-                player.health = 1;
-            }
-            //after the for loop we Restart the game when the Alert has been closed
+        function winner(element){
+            let player = element;
+            let container = document.getElementById('winner-cont');
+            
+            container.classList.add('appear');
+            container.textContent = `${player.enemy.name} Wins!`;
+        }
+        function restart(){
+            alert(`Prepare for a new Battle`);
             location.reload(true);
+        }
+        for(let player of players){
+            if(player.health <= 0){
+                winner(player);
+                alert(`Game Over. ${player.name.toUpperCase()} Has Been Defeated!!!`);
+                player.health = 1;
+
+                window.setTimeout(restart,1500);
+                
+            }
         }
     }
 
