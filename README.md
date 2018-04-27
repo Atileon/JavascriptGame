@@ -1,4 +1,4 @@
-:construction: This project is under construction yet
+
 
 # Ava's Game Canvas
 ## Another Openclassrooms Project
