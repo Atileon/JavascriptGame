@@ -52,34 +52,22 @@ class Map {
             }
         }
     }
-}
+}//end Map class
 
 class Component{
     constructor(area = 'a',width,height,color){
         // The area variable will set the area where the component would be deployed
         this.area = area;
-
         //next 3 lines to set a random position for the players
         this.startId = this.startArea();// this simply to set an tile to deploy component followin the starArea method
         this.x = this.getX();// Once the startId is calculated this gets the relative coord on X
         this.y = this.getY();// Once the startId is calculated this gets the relative coord on Y
-        
         this.w = width;// width of component 
         this.h = height;// height of component
         this.color = color; // a fallback color because of future improvements any component will be drawn with image
         // The tileId give us the "visual" Id on map and allow us to use it to compare positions with any other
         // component on game
         this.tileId = this.getId();
-
-    }
-    getX(){
-        //This method just to obtain the X coordinate
-        let coordX = Math.floor(this.startId % 10)*64;//value on X axis
-        return this.x = coordX
-    }
-    getY(){
-        let coordY = Math.floor(this.startId / 10)*64;//value on Y axis
-        return this.y = coordY
     }
     getId(){
         //this method could get us the Tile Id on Map to 
@@ -89,12 +77,17 @@ class Component{
         this.tileId = Math.floor(this.tileY * 10)+ this.tileX;
         return this.tileId;
     }
+    drawIt(){
+        // This simply draw the Component on canvas
+        let context = canvas.getContext('2d');
+        context.fillStyle = this.color;
+        context.fillRect(this.x, this.y, this.w, this.h);
+    }
     startArea(){
         // this method give the component an area to start on map
         // the Top Area is 'a'
         // the Middle Area is 'b'
         // and the Bottom Area is 'c'
-
         switch(this.area){
             case 'a':
             let tileIdA = Math.floor(Math.random()*20-1);
@@ -109,16 +102,18 @@ class Component{
             return this.startId = tileIdC;
             break;
         }
-        return this.startId;
     }
-    drawIt(){
-        // This simply draw the Component on canvas
-        let context = canvas.getContext('2d');
-        context.fillStyle = this.color;
-        context.fillRect(this.x, this.y, this.w, this.h);
+    getX(){
+        //This method just to obtain the X coordinate
+        let coordX = Math.floor(this.startId % 10)*64;//value on X axis
+        return this.x = coordX
     }
-
-}
+    getY(){
+        let coordY = Math.floor(this.startId / 10)*64;//value on Y axis
+        return this.y = coordY
+    }
+    
+}//end Component class
 
 class Weapon extends Component {
     constructor(area,width,height,color,name, damage){
@@ -127,7 +122,7 @@ class Weapon extends Component {
         this.damage = damage;// the damage of Weapon
     }
     
-}
+}//end Weapon class
 class Obstacle extends Component{
     constructor(area,width,height, color,weaponArr){
         super(area,width,height,color);
@@ -156,7 +151,7 @@ class Obstacle extends Component{
         }
     }
     
-}
+}//end Obstacle class
 
 class Player extends Component {
     
@@ -175,10 +170,6 @@ class Player extends Component {
     }
     set nemesis(val){
         this.enemy = val;
-    }
-    healthPlayer(){
-        this.health = this.health;
-        console.log(this.health);
     }
     attack(){
 
@@ -280,7 +271,7 @@ class Player extends Component {
         this.x += this.w;
     }
     
-}
+}//end Player class
 
 
 //========================THE GAME================================
