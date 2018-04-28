@@ -157,12 +157,12 @@ class Player extends Component {
     
     constructor(area,width,height,color,name,weaponsArr,startWeapon){
         super(area,width,height,color);
-        this.enemy = this.nemesis; //this to set the another player array
-        this.name = name;
-        this.health = 100;
-        this.weaponArr = weaponsArr;
-        this.weapon = this.weaponArr[startWeapon];
-        this.damageP = this.weapon.damage;
+        this.enemy = this.nemesis; //this to set the enemy object (another player object)
+        this.name = name; // Name of player
+        this.health = 100; // The health of players are 100 by default
+        this.weaponArr = weaponsArr; // Here will be passed the weapons array to iterate
+        this.weapon = this.weaponArr[startWeapon]; // This sets the basic weapon when game starts
+        this.damageP = this.weapon.damage; // This takes the damage value of current weapon
         this.defense = false;// This is the shield of player, if activated this turns True;
     }
     get nemesis(){
@@ -177,8 +177,7 @@ class Player extends Component {
         let pElement = document.createElement('p');
 
         container.innerHTML = '';
-        
-        
+
         this.enemy.hit = this.damageP;        
         if(this.enemy.defense){
             this.enemy.hit = (this.damageP /2);
@@ -203,7 +202,6 @@ class Player extends Component {
     drawP(img){// this take the global context variable to draw Component
         let context = canvas.getContext('2d');
         context.drawImage(img, this.x, this.y, this.w, this.h);
-        // context.setTransform(1, 0, 0, 1, 0, 0);
     }
 
     // FOR PRESENTATION
@@ -246,17 +244,7 @@ class Player extends Component {
         }else if((this.y + this.h) > canvas.width){
             this.moveUp();
         }
-        // =================
-        // for(let i= 0; i < this.weaponArr.length;i++){
-            
-        //     if((this.x + this.w) > this.weaponArr[i].x
-        //         && this.x < (this.weaponArr[i].x + this.w)
-        //         && this.y == this.weaponArr[i].y){
-        //             console.log('current value of x now! ' +this.x);
-        //             this.x = this.x; 
-        //             this.y = this.y;
-        //         }
-        // }
+        
     }
     moveUp(){
         this.y -= this.h;
@@ -308,18 +296,18 @@ function avaGame(){
     let players = [];// here would be pushed the players
     let obstacles = [];//here would be pushed the obstacles
 
-    let images = [];
+    // let images = [];
 
     let tileSheet = new Image();//Actually this is the tilesheet image for the map
     tileSheet.addEventListener('load', drawGame, false);
     tileSheet.src = '../img/tilesheet.png'
 
     let imgp1 = new Image();
-    imgp1.onload = imgLoaded();
+    imgp1.onload = imgLoaded();// Just to console when loaded
     imgp1.src = '../img/playerA.png';
 
     let imgp2 = new Image();
-    imgp2.onload = imgLoaded();
+    imgp2.onload = imgLoaded();// Just to console when loaded
     imgp2.src =  '../img/playerB.png';
 
     function imgLoaded(){
