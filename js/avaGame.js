@@ -402,8 +402,8 @@ function avaGame(){
             case 87:
             obj.moveUp(); //player method
             moveCounter +=1;// to switch player
-            break
-           //down arrow (S)
+            break;
+            //down arrow (S)
             case 83:
             obj.moveDown();
             moveCounter +=1;
@@ -418,34 +418,31 @@ function avaGame(){
             obj.moveRight();
             moveCounter +=1;
             break;
-            
-            // Enter keyboard, this to switch immediatly to another player
+            // Key (Enter), this to switch immediatly to another player
             case 13:
             moveCounter +=3;
             break;
-
-            case 72: // Key (H) to take weapon
+            // Key (H) to take weapon
+            case 72: 
             obj.getWeapon();
             break;
-
-            case 78:// Key (N) to attack
+            // Key (N) to attack
+            case 78:
             if(fight){
                 obj.attack();
-            moveCounter +=3;
-            break;
+                moveCounter +=3;
+                break;
             }
-                        
-            case 77: // Key (M) to activate defense shield
+            // Key (M) to activate defense shield
+            case 77:
             if(fight){
                 obj.shield();
-            moveCounter +=3;
-            break;
+                moveCounter +=3;
+                break;
             }
             
         }
 
-        
-        
         // ==== The tile collision for players fight event
         if(p1.getId() == p2.getId()){
             fight = true;
