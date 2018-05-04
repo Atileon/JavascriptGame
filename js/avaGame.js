@@ -191,7 +191,7 @@ class Player extends Component {
         pElement.textContent = `
         > ${this.name.toUpperCase()} has attacked ${this.enemy.name.toUpperCase()} !! 
         Now ${this.enemy.name.toUpperCase()}'s health is ${this.enemy.health} __
-        `;
+        `;//close template literal
         container.appendChild(pElement);
     }
     shield(){
@@ -399,31 +399,27 @@ function avaGame(){
         let currentY = obj.y; //current position of player on Y
         
         switch(e.keyCode){
-            case 87://up arrow (W)
-            obj.moveUp();
-            moveCounter +=1;
+            //up arrow (W)
+            case 87:
+            obj.moveUp(); //player method
+            moveCounter +=1;// to switch player
             break
-           
-            case 83://down arrow (S)
+           //down arrow (S)
+            case 83:
             obj.moveDown();
             moveCounter +=1;
             break;
-            
-            case 65://left arrow (A)
+            //left arrow (A)
+            case 65:
             obj.moveLeft();
             moveCounter +=1;
-            console.log('now'+obj.name+'is at '+obj.x);
             break;
-            
-            case 68://right arrow (D)
-            
-            if(dontMove == false){
-                obj.moveRight();
+            //right arrow (D)
+            case 68:
+            obj.moveRight();
             moveCounter +=1;
             break;
-            }
             
-
             // Enter keyboard, this to switch immediatly to another player
             case 13:
             moveCounter +=3;
@@ -482,11 +478,11 @@ function avaGame(){
         // this could increment the movecounter to switch player
         if(moveCounter >= 3){
 
-            playerId ++;
-            moveCounter = 0;
+            playerId ++;// this switch to next player
+            moveCounter = 0;// this would be the first player
 
             if (playerId >= players.length){
-                 playerId = 0;
+                 playerId = 0; // this return to first player
             }
 
             alert('Player '+(players[playerId].name.toUpperCase())+ ' Turn!!');
