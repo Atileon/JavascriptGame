@@ -390,7 +390,6 @@ function avaGame(){
     // Global Variables
     let moveCounter = 0;
     let playerId = 0;
-    let turnChange = false;
 
     window.addEventListener('keydown', function(e){movement(players[playerId],e)});
     
@@ -432,7 +431,6 @@ function avaGame(){
             case 78:// Key (N) to attack
             if(fight){
                 obj.attack();
-
             moveCounter +=3;
             break;
             }
