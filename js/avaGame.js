@@ -14,7 +14,6 @@
 //    -create weapons on map
 //    -update all functions with current/updated values
 'use strict';
- var lak = "lak"
 // import Map from "./modules/ava-map.js";
 // import Component from './modules/ava-component.js';
 // import Weapon from './modules/ava-weapon.js';
