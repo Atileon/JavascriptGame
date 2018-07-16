@@ -20,7 +20,6 @@
 // import Obstacle from './modules/ava-obstacle.js';
 // import Player from './modules/ava-player.js';
 
-import {Map, Component, Weapon, Obstacle, Player} from './ava-components.js';
 
 //========================THE GAME================================
 window.addEventListener("load", WindowLoaded, false);

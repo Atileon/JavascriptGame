@@ -1,5 +1,5 @@
 //=========================CLASSES==============================
-export class Map {
+ class Map {
     constructor(cols,rows,tileW,tileH,arr,ctx){
         this.cols = cols;//columns of map
         this.rows = rows;//rows of map
@@ -38,7 +38,7 @@ export class Map {
     }
 }//end Map class
 
-export class Component{
+ class Component{
     constructor(area = 'a',width,height,color){
         // The area variable will set the area where the component would be deployed
         this.area = area;
@@ -99,7 +99,7 @@ export class Component{
     
 }//end Component class
 
-export class Weapon extends Component {
+ class Weapon extends Component {
     constructor(area,width,height,color,name, damage){
         super(area,width,height,color);
         this.name = name;// the name of Weapon
@@ -107,7 +107,7 @@ export class Weapon extends Component {
     }
     
 }//end Weapon class
-export class Obstacle extends Component{
+ class Obstacle extends Component{
     constructor(area,width,height, color,weaponArr){
         super(area,width,height,color);
         //The Obstacle Object takes the Weapons array to prevent overlay with Weapons objects
@@ -137,7 +137,7 @@ export class Obstacle extends Component{
     
 }//end Obstacle class
 
-export class Player extends Component {
+ class Player extends Component {
     
     constructor(area,width,height,color,name,weaponsArr,startWeapon){
         super(area,width,height,color);
